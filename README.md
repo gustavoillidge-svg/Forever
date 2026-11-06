@@ -35,6 +35,10 @@ Abre `index.html` en el navegador o despliega el proyecto en un servidor web est
 - Service Workers (PWA)
 - Web App Manifest
 
+## Assets
+
+Los recursos estáticos (iconos, imágenes y catálogos) se encuentran en `assets/` y `icons/`.
+
 ## Licencia
 
 MIT
