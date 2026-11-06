@@ -55,59 +55,77 @@ function updateRaceOptions() {
   });
 }
 
+let allAbilitiesCache = [];
+
 function updateSpellPool() {
   const pool = document.getElementById('spellPool');
   pool.innerHTML = '';
-  
+  const search = document.getElementById('spellSearch');
+  if (search) search.value = '';
+
   if (!currentClass) {
+    allAbilitiesCache = [];
     pool.innerHTML = '<div class="empty-hint">Selecciona clase y raza para ver los hechizos disponibles.</div>';
     return;
   }
-  
-  const spells = SPELLS[currentClass] || [];
-  const racials = currentRace ? (RACIALS[currentRace] || []) : [];
-  
-  // Combinar y filtrar por nivel
-  const allAbilities = [
+
+  const spells = (typeof SPELLS !== 'undefined' && SPELLS[currentClass]) ? SPELLS[currentClass] : [];
+  const racials = (typeof RACIALS !== 'undefined' && currentRace && RACIALS[currentRace]) ? RACIALS[currentRace] : [];
+  const extra = (typeof RACIALS !== 'undefined' && currentRace && RACIALS[currentRace + '_extra']) ? RACIALS[currentRace + '_extra'] : [];
+
+  allAbilitiesCache = [
     ...spells.map(s => ({ ...s, type: 'spell' })),
-    ...racials.map(r => ({ ...r, type: 'racial' }))
+    ...racials.map(r => ({ ...r, type: 'racial' })),
+    ...extra.map(r => ({ ...r, type: 'racial' }))
   ].filter(a => a.level <= currentLevel);
-  
-  if (allAbilities.length === 0) {
-    pool.innerHTML = '<div class="empty-hint">No hay hechizos disponibles para este nivel.</div>';
+
+  renderSpellPool(allAbilitiesCache);
+}
+
+function filterSpellPool() {
+  const q = (document.getElementById('spellSearch')?.value || '').toLowerCase().trim();
+  if (!q) { renderSpellPool(allAbilitiesCache); return; }
+  renderSpellPool(allAbilitiesCache.filter(a => (a.name + ' ' + (a.nameEn || '')).toLowerCase().includes(q)));
+}
+
+function renderSpellPool(abilities) {
+  const pool = document.getElementById('spellPool');
+  pool.innerHTML = '';
+  if (!abilities || abilities.length === 0) {
+    pool.innerHTML = '<div class="empty-hint">No hay hechizos disponibles para este nivel/filtro.</div>';
     return;
   }
-  
-  allAbilities.forEach(ability => {
+  abilities.forEach(ability => {
     const div = document.createElement('div');
     div.className = 'spell-item';
     div.draggable = true;
     div.dataset.name = ability.name;
-    div.dataset.nameEn = ability.nameEn;
-    div.dataset.icon = ability.icon;
-    div.dataset.level = ability.level;
-    div.dataset.type = ability.type;
-    
-    // Icono (usando Wowhead CDN con el nombre del icono)
+    div.dataset.nameEn = ability.nameEn || ability.name;
+    div.dataset.icon = ability.icon || '';
+    div.dataset.level = ability.level || 1;
+    div.dataset.type = ability.type || 'spell';
+    div.dataset.role = ability.role || '';
+    div.dataset.desc = ability.desc || '';
+
     const img = document.createElement('img');
     img.src = `https://wow.zamimg.com/images/wow/icons/small/${ability.icon}.jpg`;
     img.alt = ability.name;
-    img.onerror = function() { this.style.display = 'none'; };
-    
+    img.onerror = function () {
+      this.onerror = null;
+      this.src = `assets/icons/small/${ability.icon}.jpg`;
+      this.onerror = function () { this.style.display = 'none'; };
+    };
+
     const span = document.createElement('span');
     span.textContent = ability.name;
-    
     const levelBadge = document.createElement('small');
     levelBadge.style.color = 'var(--text-muted)';
     levelBadge.style.fontSize = '10px';
     levelBadge.textContent = `Nv.${ability.level}`;
-    
     div.appendChild(img);
     div.appendChild(span);
     div.appendChild(levelBadge);
-    
     div.addEventListener('dragstart', onDragStart);
-    
     pool.appendChild(div);
   });
 }
@@ -154,7 +172,9 @@ function onDragStart(e) {
     nameEn: e.target.dataset.nameEn,
     icon: e.target.dataset.icon,
     level: parseInt(e.target.dataset.level),
-    type: e.target.dataset.type
+    type: e.target.dataset.type,
+    role: e.target.dataset.role || '',
+    desc: e.target.dataset.desc || ''
   };
   e.dataTransfer.effectAllowed = 'copy';
   e.dataTransfer.setData('text/plain', e.target.dataset.name);
@@ -173,9 +193,7 @@ function onDragLeave(e) {
 function onDrop(e) {
   e.preventDefault();
   document.getElementById('sequenceZone').classList.remove('drag-over');
-  
   if (!draggedItem) return;
-  
   sequence.push({ ...draggedItem });
   renderSequence();
   draggedItem = null;
@@ -183,122 +201,131 @@ function onDrop(e) {
 
 function renderSequence() {
   const zone = document.getElementById('sequenceZone');
-  
   if (sequence.length === 0) {
     zone.innerHTML = '<div class="empty-hint">Arrastra hechizos aquí para construir tu macro.<br>El orden importa: el primero se ejecutará primero.</div>';
     return;
   }
-  
   zone.innerHTML = '';
-  
   sequence.forEach((item, index) => {
     const slot = document.createElement('div');
     slot.className = 'sequence-slot';
     slot.draggable = true;
-    
     const idx = document.createElement('span');
     idx.className = 'slot-index';
     idx.textContent = `${index + 1}.`;
-    
     const img = document.createElement('img');
     img.src = `https://wow.zamimg.com/images/wow/icons/small/${item.icon}.jpg`;
-    img.onerror = function() { this.style.display = 'none'; };
-    
+    img.onerror = function () {
+      this.onerror = null;
+      this.src = `assets/icons/small/${item.icon}.jpg`;
+      this.onerror = function () { this.style.display = 'none'; };
+    };
     const name = document.createElement('span');
     name.textContent = item.name;
     name.style.fontSize = '13px';
-    
     const removeBtn = document.createElement('button');
     removeBtn.className = 'remove-btn';
     removeBtn.textContent = '✕';
-    removeBtn.onclick = () => {
-      sequence.splice(index, 1);
-      renderSequence();
-    };
-    
+    removeBtn.onclick = () => { sequence.splice(index, 1); renderSequence(); };
     slot.appendChild(idx);
     slot.appendChild(img);
     slot.appendChild(name);
     slot.appendChild(removeBtn);
-    
     zone.appendChild(slot);
   });
+}
+
+function isHelpful(ability) {
+  if (!ability) return false;
+  if (ability.role === 'heal' || ability.role === 'buff') return true;
+  const t = `${ability.name} ${ability.nameEn} ${ability.desc || ''}`.toLower();
+  return /heal|curaci|bendici|blessing|renew|sanaci|light|shield|resur|fortitude|mark|rejuven|regrowth|aura|salva|protecci/.test(t);
+}
+function isHarmful(ability) {
+  if (!ability) return false;
+  if (ability.role === 'damage' || ability.role === 'debuff') return true;
+  const t = `${ability.name} ${ability.nameEn} ${ability.desc || ''}`.toLower();
+  return /golpe|strike|smite|bolt|fire|frost|shadow|ejecut|rend|mortal|wrath|shot|sting|sinister|evisc|curse|drain|doom|fear/.test(t);
 }
 
 function generateMacro() {
   if (sequence.length === 0) {
     document.getElementById('macroOutput').textContent = '⚠️ Añade al menos un hechizo a la secuencia.';
+    document.getElementById('copyBtn').style.display = 'none';
     return;
   }
-  
+
   const lines = [];
-  
-  // #showtooltip
-  if (document.getElementById('opt_showtooltip')?.checked) {
-    lines.push('#showtooltip');
+  const warnings = [];
+  const first = sequence[0];
+
+  let useHelp = !!document.getElementById('opt_help')?.checked;
+  let useHarm = !!document.getElementById('opt_harm')?.checked;
+  const useMouseover = !!document.getElementById('opt_mouseover')?.checked;
+  const useNodead = !!document.getElementById('opt_nodead')?.checked;
+  const useExists = !!document.getElementById('opt_exists')?.checked;
+  const useCombat = !!document.getElementById('opt_combat')?.checked;
+
+  if (useHelp && isHarmful(first) && !isHelpful(first)) {
+    warnings.push('[help] omitido: el primer hechizo parece de daño/hostil.');
+    useHelp = false;
   }
-  
-  // /startattack
-  if (document.getElementById('opt_startattack')?.checked) {
-    lines.push('/startattack');
+  if (useHarm && isHelpful(first) && !isHarmful(first)) {
+    warnings.push('[harm] omitido: el primer hechizo parece de curación/buff/amistoso.');
+    useHarm = false;
   }
-  
-  // /petattack
-  if (document.getElementById('opt_petattack')?.checked) {
-    lines.push('/petattack');
+  if (useMouseover && !useHelp && !useHarm) {
+    warnings.push('[@mouseover] sin [help]/[harm]: puede fallar en objetivos no válidos; añade una condición de objetivo.');
   }
-  
-  // /stopcasting
-  if (document.getElementById('opt_stopcasting')?.checked) {
-    lines.push('/stopcasting');
-  }
-  
-  // /cancelaura
+
+  if (document.getElementById('opt_showtooltip')?.checked) lines.push('#showtooltip');
+  if (document.getElementById('opt_stopcasting')?.checked) lines.push('/stopcasting');
+  if (document.getElementById('opt_startattack')?.checked) lines.push('/startattack');
+  if (document.getElementById('opt_petattack')?.checked) lines.push('/petattack');
   if (document.getElementById('opt_cancelaura')?.checked) {
     const auraName = prompt('Nombre del aura a cancelar (ej: Bloque de Hielo):', 'Bloque de Hielo');
-    if (auraName) {
-      lines.push(`/cancelaura ${auraName}`);
-    }
+    if (auraName) lines.push(`/cancelaura ${auraName}`);
   }
-  
-  // Construir condiciones
-  const conditions = [];
-  
-  if (document.getElementById('opt_mouseover')?.checked) conditions.push('@mouseover');
-  if (document.getElementById('opt_harm')?.checked) conditions.push('harm');
-  if (document.getElementById('opt_help')?.checked) conditions.push('help');
-  if (document.getElementById('opt_nodead')?.checked) conditions.push('nodead');
-  if (document.getElementById('opt_exists')?.checked) conditions.push('exists');
-  if (document.getElementById('opt_combat')?.checked) conditions.push('combat');
-  
-  const conditionStr = conditions.length > 0 ? `[${conditions.join(',')}] ` : '';
-  
-  // Verificar modificadores
-  const modShift = document.getElementById('modShift')?.checked;
-  const modCtrl = document.getElementById('modCtrl')?.checked;
-  const modAlt = document.getElementById('modAlt')?.checked;
-  
-  const useCastsequence = document.getElementById('opt_castsequence')?.checked;
-  
+
+  const condParts = [];
+  if (useMouseover) condParts.push('@mouseover');
+  if (useHarm) condParts.push('harm');
+  if (useHelp) condParts.push('help');
+  if (useNodead) condParts.push('nodead');
+  if (useExists) condParts.push('exists');
+  if (useCombat) condParts.push('combat');
+  const condStr = condParts.length ? `[${condParts.join(',')}]` : '';
+
+  const mods = [];
+  if (document.getElementById('modShift')?.checked) mods.push('shift');
+  if (document.getElementById('modCtrl')?.checked) mods.push('ctrl');
+  if (document.getElementById('modAlt')?.checked) mods.push('alt');
+  const useCastsequence = !!document.getElementById('opt_castsequence')?.checked;
+
   if (useCastsequence) {
-    // Usar /castsequence
     const spellNames = sequence.map(s => s.name).join(', ');
-    lines.push(`/castsequence reset=target ${conditionStr}${spellNames}`);
+    lines.push(`/castsequence reset=target ${condStr ? condStr + ' ' : ''}${spellNames}`);
+    if (mods.length) warnings.push('Modificadores no aplicados a /castsequence (la secuencia ya usa todos los hechizos).');
+  } else if (mods.length) {
+    // Ramas condicionales reales: [mod:X] h1; [mod:Y] h2; hDefault
+    const modConds = mods.map(m => condStr ? `[mod:${m},${condParts.join(',')}]` : `[mod:${m}]`);
+    const fallbackCond = condStr || '';
+    const branches = [];
+    modConds.forEach((mc, i) => {
+      const spell = sequence[Math.min(i, sequence.length - 1)].name;
+      branches.push(`${mc} ${spell}`);
+    });
+    const defaultSpell = sequence[Math.min(mods.length, sequence.length - 1)].name;
+    branches.push(fallbackCond ? `${fallbackCond} ${defaultSpell}` : defaultSpell);
+    lines.push(`/cast ${branches.join('; ')}`);
   } else {
-    // Usar /cast normales (prioridad de bloques)
-    sequence.forEach((spell, i) => {
-      if (i === 0 && conditionStr) {
-        lines.push(`/cast ${conditionStr}${spell.name}`);
-      } else if (i === 0 && modShift) {
-        lines.push(`/cast [mod:shift] ${spell.name}`);
-      } else {
-        lines.push(`/cast ${spell.name}`);
-      }
+    sequence.forEach(spell => {
+      lines.push(`/cast ${condStr ? condStr + ' ' : ''}${spell.name}`);
     });
   }
-  
-  const macroText = lines.join('\n');
-  document.getElementById('macroOutput').textContent = macroText;
+
+  if (warnings.length) lines.push('', '# Advertencias:', ...warnings.map(w => '# - ' + w));
+  document.getElementById('macroOutput').textContent = lines.join('\n');
   document.getElementById('copyBtn').style.display = 'inline-block';
 }
 

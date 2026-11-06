@@ -20,10 +20,14 @@ const RACES = {
   dwarf: { name: 'Enano', nameEn: 'Dwarf', faction: 'alliance', icon: 'achievement_character_dwarf_male' },
   nightelf: { name: 'Elfo de la Noche', nameEn: 'Night Elf', faction: 'alliance', icon: 'achievement_character_nightelf_male' },
   gnome: { name: 'Gnomo', nameEn: 'Gnome', faction: 'alliance', icon: 'achievement_character_gnome_male' },
+  draenei: { name: 'Draenei (Forever, si aplica)', nameEn: 'Draenei', faction: 'alliance', icon: 'achievement_character_draenei_male' },
   orc: { name: 'Orco', nameEn: 'Orc', faction: 'horde', icon: 'achievement_character_orc_male' },
   undead: { name: 'No-Muerto', nameEn: 'Undead', faction: 'horde', icon: 'achievement_character_undead_male' },
   tauren: { name: 'Tauren', nameEn: 'Tauren', faction: 'horde', icon: 'achievement_character_tauren_male' },
-  troll: { name: 'Trol', nameEn: 'Troll', faction: 'horde', icon: 'achievement_character_troll_male' }
+  troll: { name: 'Trol', nameEn: 'Troll', faction: 'horde', icon: 'achievement_character_troll_male' },
+  bloodelf: { name: 'Elfo de Sangre (Forever, si aplica)', nameEn: 'Blood Elf', faction: 'horde', icon: 'achievement_character_bloodelf_male' },
+  skyborne_alliance: { name: 'Nacido del Cielo — Orden Suprema (Alianza)', nameEn: 'Skyborne — High Order (Alliance)', faction: 'alliance', icon: 'ability_druid_flightform' },
+  skyborne_horde: { name: 'Nacido del Cielo — Moldeavientos (Horda)', nameEn: 'Skyborne — Windshaper (Horde)', faction: 'horde', icon: 'ability_druid_flightform' }
 };
 
 // Raciales (habilidades activas que se pueden usar en macros)
@@ -75,6 +79,26 @@ const RACIALS = {
     { name: 'Regeneración', nameEn: 'Regeneration', level: 1, icon: 'spell_nature_regeneration', desc: 'Pasiva: +10% regeneración de vida.' },
     { name: 'Lanzador de Hachas', nameEn: 'Throwing Specialization', level: 1, icon: 'inv_weapon_halberd_04', desc: 'Pasiva: +1% crítico con armas arrojadizas.' },
     { name: 'Matar Bestias', nameEn: 'Beast Slaying', level: 1, icon: 'ability_hunter_snipershot', desc: 'Pasiva: +5% daño a bestias.' }
+  ],
+  draenei: [
+    { name: 'Don de los Naaru', nameEn: 'Gift of the Naaru', level: 1, icon: 'spell_holy_holyprotection', desc: '[VERIFICAR Forever] Curación HoT racial (referencia TBC).' },
+    { name: 'Presencia Heroica', nameEn: 'Heroic Presence', level: 1, icon: 'inv_helmet_21', desc: '[VERIFICAR Forever] Bono de golpe racial (referencia TBC).' }
+  ],
+  bloodelf: [
+    { name: 'Torrente Arcano', nameEn: 'Arcane Torrent', level: 1, icon: 'spell_shadow_teleport', desc: '[VERIFICAR Forever] Silencio/recupera recurso (referencia TBC).' }
+  ],
+  // Skyborne / Nacidos del Cielo (WoW Forever, razas nuevas). Datos orientativos basados en guías públicas (Wowhead/Icy Veins/foreverdb); [VERIFICAR] nombres exactos en cliente ES.
+  skyborne_alliance: [
+    { name: 'Bendición de la Corona', nameEn: 'Crown\'s Blessing', level: 1, icon: 'spell_holy_innerfire', desc: '[VERIFICAR] Activa: beneficio defensivo/soporte (High Order).' },
+    { name: 'Postura Real', nameEn: 'Royal Poise', level: 1, icon: 'spell_holy_sealofwisdom', desc: '[VERIFICAR] Pasiva: afinidad a maná/curación o utilidad (High Order).' },
+    { name: 'Plumaje Resistente', nameEn: 'Feathered Fortitude', level: 1, icon: 'inv_misc_feather_01', desc: '[VERIFICAR] Pasiva racial Skyborne.' },
+    { name: 'Deslizamiento Aéreo', nameEn: 'Aerial Glide', level: 1, icon: 'ability_druid_flightform', desc: '[VERIFICAR] Movilidad/caída controlada racial Skyborne.' }
+  ],
+  skyborne_horde: [
+    { name: 'Impulso del Vendaval', nameEn: 'Gale Surge', level: 1, icon: 'spell_nature_cyclone', desc: '[VERIFICAR] Activa: ráfaga de velocidad/daño o utilidad (Windshaper).' },
+    { name: 'Instinto de Tormenta', nameEn: 'Storm Instinct', level: 1, icon: 'spell_nature_lightning', desc: '[VERIFICAR] Pasiva: afinidad ofensiva/utilidad (Windshaper).' },
+    { name: 'Plumaje Resistente', nameEn: 'Feathered Fortitude', level: 1, icon: 'inv_misc_feather_01', desc: '[VERIFICAR] Pasiva racial Skyborne.' },
+    { name: 'Deslizamiento Aéreo', nameEn: 'Aerial Glide', level: 1, icon: 'ability_druid_flightform', desc: '[VERIFICAR] Movilidad/caída controlada racial Skyborne.' }
   ]
 };
 
