@@ -44,3 +44,6 @@ Los recursos estáticos (iconos, imágenes y catálogos) se encuentran en `asset
 ## Licencia
 
 MIT
+
+---
+Última actualización: noviembre 2026
