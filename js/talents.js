@@ -197,22 +197,23 @@ function onTalentLevelChange() { updatePointsRemaining(); }
 function updatePointsRemaining() {
   const level = parseInt(document.getElementById('talentLevelInput').value) || 60;
   const maxPoints = Math.max(0, Math.min(51, level - 9));
-  document.getElementById('pointsRemaining').textContent = Puntos disponibles:  / ;
+  document.getElementById('pointsRemaining').textContent = `Puntos disponibles: ${maxPoints - talentPointsSpent} / ${maxPoints}`;
 }
 function renderTalentTrees(classKey) {
   const data = TALENT_DATA[classKey]; if (!data) return;
   const container = document.getElementById('talentTrees'); container.innerHTML = '';
   data.trees.forEach((tree, treeIdx) => {
     const treeDiv = document.createElement('div'); treeDiv.className = 'talent-tree';
-    const h4 = document.createElement('h4'); h4.textContent = ${tree.name} (); treeDiv.appendChild(h4);
+    const h4 = document.createElement('h4'); h4.textContent = `${tree.name} (${tree.nameEn})`; treeDiv.appendChild(h4);
+
     tree.talents.forEach((talent, talentIdx) => {
       const row = document.createElement('div'); row.className = 'talent-row';
       const node = document.createElement('div'); node.className = 'talent-node';
       node.dataset.tree = treeIdx; node.dataset.talent = talentIdx; node.dataset.class = classKey;
       const currentRank = talentState[classKey]?.[treeIdx]?.[talentIdx] || 0;
-      if (currentRank > 0) node.classList.add(ank-);
+      if (currentRank > 0) node.classList.add(`rank-${Math.min(currentRank, 3)}`);
       node.textContent = talent.name.split(' ').map(w => w[0]).join('').substring(0,2);
-      if (currentRank > 0) { const badge = document.createElement('span'); badge.className='rank-badge'; badge.textContent = ${currentRank}/; node.appendChild(badge); }
+      if (currentRank > 0) { const badge = document.createElement('span'); badge.className='rank-badge'; badge.textContent = `${currentRank}/${talent.maxRank}`; node.appendChild(badge); }
       node.addEventListener('mouseenter', () => showTalentInfo(talent, currentRank));
       node.addEventListener('click', () => addTalentPoint(classKey, treeIdx, talentIdx, talent));
       row.appendChild(node); treeDiv.appendChild(row);
