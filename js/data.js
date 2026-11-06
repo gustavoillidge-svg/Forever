@@ -345,21 +345,40 @@ const SPELLS = {
   ]
 };
 
-// Opciones de macro con descripciones para tooltips
+// Combinaciones raza↔clase (referencia Classic; Forever puede diferir) [VERIFICAR Forever]
+// Incluye skyborne_* como permisivo por ser contenido custom.
+const RACE_CLASSES = {
+  human: ['warrior','paladin','rogue','priest','mage','warlock'],
+  dwarf: ['warrior','paladin','hunter','rogue','priest'],
+  nightelf: ['warrior','hunter','rogue','priest','druid'],
+  gnome: ['warrior','rogue','mage','warlock'],
+  draenei: ['warrior','paladin','hunter','priest','shaman','mage'], // [VERIFICAR]
+  orc: ['warrior','hunter','rogue','shaman','warlock'],
+  undead: ['warrior','rogue','priest','mage','warlock'],
+  tauren: ['warrior','hunter','shaman','druid'],
+  troll: ['warrior','hunter','rogue','priest','shaman','mage'],
+  bloodelf: ['paladin','hunter','rogue','priest','mage','warlock'], // [VERIFICAR]
+  skyborne_alliance: ['warrior','paladin','hunter','rogue','priest','mage','warlock','druid','shaman'], // [VERIFICAR]
+  skyborne_horde: ['warrior','hunter','rogue','priest','mage','warlock','druid','shaman'] // [VERIFICAR]
+};
+
+// Opciones de macro con descripciones para tooltips/help accesible
 const MACRO_OPTIONS = [
-  { id: 'showtooltip', label: '#showtooltip', desc: 'Muestra el icono y tooltip del primer hechizo en la macro. Siempre recomendado.', default: true },
-  { id: 'startattack', label: '/startattack', desc: 'Inicia el ataque automático contra el objetivo actual. Útil para guerreros, pícaros, cazadores, etc.', default: false },
-  { id: 'petattack', label: '/petattack', desc: 'Ordena a tu mascota atacar al objetivo actual. Para cazadores, brujos y caballeros de la muerte.', default: false },
-  { id: 'stopcasting', label: '/stopcasting', desc: 'Interrumpe el lanzamiento actual. Útil para macros de interrupción o emergencia.', default: false },
-  { id: 'cancelaura', label: '/cancelaura [nombre]', desc: 'Cancela un buff o aura específico. Ejemplo: /cancelaura Bloque de Hielo.', default: false },
-  { id: 'castsequence', label: '/castsequence reset=...', desc: 'Convierte la secuencia en un castsequence que avanza paso a paso con cada pulsación.', default: false },
-  { id: 'mouseover', label: '[@mouseover]', desc: 'El hechizo se lanza sobre el objetivo bajo el cursor, sin necesidad de seleccionarlo.', default: false },
-  { id: 'harm', label: '[harm]', desc: 'Solo lanza el hechizo si el objetivo es hostil. Para hechizos de daño.', default: false },
-  { id: 'help', label: '[help]', desc: 'Solo lanza el hechizo si el objetivo es amistoso. Para hechizos de curación o buffs.', default: false },
-  { id: 'nodead', label: '[nodead]', desc: 'Solo lanza el hechizo si el objetivo está vivo. Evita desperdiciar hechizos en cadáveres.', default: false },
-  { id: 'exists', label: '[exists]', desc: 'Solo lanza el hechizo si el objetivo existe. Evita errores cuando no hay objetivo.', default: false },
-  { id: 'combat', label: '[combat]', desc: 'Solo lanza el hechizo si estás en combate.', default: false },
-  { id: 'nostance', label: '[nostance]', desc: 'Solo lanza el hechizo si no estás en una forma o actitud específica.', default: false },
-  { id: 'mod', label: '[mod:shift/ctrl/alt]', desc: 'Añade una rama condicional para modificadores de teclado. Requiere configurar los checkboxes de abajo.', default: false }
+  { id: 'showtooltip', label: '#showtooltip', desc: 'Muestra el icono y tooltip del primer hechizo. Recomendado. Debe ir en la primera línea.', default: true },
+  { id: 'startattack', label: '/startattack', desc: 'Inicia el auto-ataque contra el objetivo. Útil para guerreros, pícaros, cazadores, etc.', default: false },
+  { id: 'petattack', label: '/petattack', desc: 'Ordena a tu mascota atacar al objetivo actual (cazador/brujo).', default: false },
+  { id: 'stopcasting', label: '/stopcasting', desc: 'Interrumpe el lanzamiento actual. Útil para interrupciones/emergencia.', default: false },
+  { id: 'cancelaura', label: '/cancelaura [nombre]', desc: 'Cancela un buff/aura específico por nombre exacto del cliente. Configura el nombre abajo.', default: false, hasInput: true },
+  { id: 'castsequence', label: '/castsequence reset=target', desc: 'Avanza la secuencia con cada pulsación (reset=target). Los modificadores no se aplican a castsequence.', default: false },
+  { id: 'mouseover', label: '[@mouseover]', desc: 'Lanza sobre el objetivo bajo el cursor. Combínalo con [help]/[harm] según el hechizo.', default: false },
+  { id: 'harm', label: '[harm]', desc: 'Solo si el objetivo es hostil (daño). Se omite automáticamente si el primer hechizo es amistoso.', default: false },
+  { id: 'help', label: '[help]', desc: 'Solo si el objetivo es amistoso (curación/buff). Se omite si el primer hechizo es hostil.', default: false },
+  { id: 'nodead', label: '[nodead]', desc: 'Solo si el objetivo está vivo.', default: false },
+  { id: 'exists', label: '[exists]', desc: 'Solo si el objetivo existe.', default: false },
+  { id: 'combat', label: '[combat]', desc: 'Solo si estás en combate.', default: false },
+  { id: 'nostance', label: '[nostance]', desc: 'Solo si no estás en una forma/actitud específica. [VERIFICAR sintaxis/contexto]', default: false },
+  { id: 'mod', label: '[mod:shift/ctrl/alt]', desc: 'Ramas condicionales reales por modificador (no aplica a /castsequence). Usa los checkboxes de modificadores.', default: false }
 ];
+
+const MACRO_META = { charLimit: 255, sourceNote: 'Datos comunitarios; [VERIFICAR Forever] en fuentes autorizadas.' };
 

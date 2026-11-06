@@ -10,18 +10,19 @@ function switchTab(tabName, ev) {
   if (btn) btn.classList.add('active');
 }
 
-// Iniciar al cargar
-document.addEventListener('DOMContentLoaded', () => {
-  initSelects();
-  updateOptions();
-  renderSequence();
+document.addEventListener('DOMContentLoaded', function () {
+  if (typeof initMacroUI === 'function') initMacroUI();
+  else { // fallback legacy
+    if (typeof initSelects === 'function') initSelects();
+    if (typeof updateOptions === 'function') updateOptions();
+    if (typeof renderSequence === 'function') renderSequence();
+  }
   const tl = document.getElementById('talentLevelInput');
-  if (tl) tl.addEventListener('change', onTalentLevelChange);
+  if (tl && typeof onTalentLevelChange === 'function') tl.addEventListener('change', onTalentLevelChange);
 
-  // Registrar Service Worker (PWA)
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('service-worker.js')
-      .then(reg => console.log('SW registrado:', reg.scope))
-      .catch(err => console.warn('SW no registrado:', err));
+      .then(function (reg) { console.log('SW registrado:', reg.scope); })
+      .catch(function (err) { console.warn('SW no registrado:', err); });
   }
 });

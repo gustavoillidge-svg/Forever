@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'wow-forever-tool-v6';
+﻿const CACHE_NAME = 'wow-forever-tool-v7';
 const ASSETS = [
   './',
   './index.html',

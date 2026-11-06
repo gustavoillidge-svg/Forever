@@ -17,7 +17,7 @@
     <span class="brand-text">Generador de Macros<span class="brand-sub">Herramienta comunitaria · datos no oficiales</span></span>
   </a>
   <div class="spacer"></div>
-  <span class="tag">WoW Forever</span>
+  <a class="tag" href="https://www.youtube.com/watch?v=oHg5SJYRHA0" target="_blank" rel="noopener noreferrer">🎁 Consigue WoW Forever gratis</a>
 </header>
 
 <!-- Pestaña de talentos oculta: foco en generador de macros -->
@@ -30,40 +30,50 @@
   <div class="config-panel">
     <h3>⚙️ Configuración del Personaje</h3>
     <div class="config-row">
-      <div class="config-group"><label>Clase</label><select id="classSelect" onchange="onClassChange()"><option value="">— Selecciona clase —</option></select></div>
-      <div class="config-group"><label>Raza</label><select id="raceSelect" onchange="onRaceChange()"><option value="">— Selecciona raza —</option></select></div>
-      <div class="config-group"><label>Nivel (1-60)</label><input type="number" id="levelInput" min="1" max="60" value="60" onchange="onLevelChange()" style="min-width:100px;"></div>
+      <div class="config-group"><label for="classSelect">Clase</label><select id="classSelect" onchange="onClassChange()" aria-label="Clase"><option value="">— Selecciona clase —</option></select></div>
+      <div class="config-group"><label for="raceSelect">Raza</label><select id="raceSelect" onchange="onRaceChange()" aria-label="Raza"><option value="">— Selecciona raza —</option></select></div>
+      <div class="config-group"><label for="levelInput">Nivel (1-60)</label><input type="number" id="levelInput" min="1" max="60" value="60" onchange="onLevelChange()" style="min-width:100px;" aria-label="Nivel"></div>
+      <div class="config-group"><label for="macroLang">Idioma de hechizos</label><select id="macroLang" onchange="onMacroLangChange()" aria-label="Idioma de nombres de hechizos en el macro"><option value="es">Español (cliente ES)</option><option value="en">English (EN client)</option></select></div>
     </div>
-    <div class="data-note">⚠️ Datos comunitarios (Classic/Forever). Nombres, niveles y disponibilidad pueden variar. Sin afiliación con Blizzard Entertainment. Elementos [VERIFICAR] requieren confirmación.</div>
+    <div class="data-note">⚠️ Datos comunitarios (Classic/Forever). Nombres, niveles, combinaciones raza/clase y disponibilidad pueden variar. Los macros usan el nombre localizado del cliente: elige el idioma correcto. Sin afiliación con Blizzard. [VERIFICAR Forever] requiere confirmación (wowhead.com/forever/talent-calc u otras fuentes autorizadas).</div>
   </div>
   <div class="config-panel">
     <h3>✨ Hechizos Disponibles (arrastra a la secuencia)</h3>
-    <input type="text" id="spellSearch" placeholder="Buscar hechizo (ES/EN)..." oninput="filterSpellPool()" style="width:100%;margin-bottom:8px;">
-    <div class="spell-pool" id="spellPool"><div class="empty-hint">Selecciona clase y raza para ver los hechizos disponibles.</div></div>
+    <input type="text" id="spellSearch" placeholder="Buscar hechizo (ES/EN)..." oninput="filterSpellPool()" style="width:100%;margin-bottom:8px;" aria-label="Buscar hechizo">
+    <div class="spell-pool" id="spellPool" aria-label="Hechizos disponibles"><div class="empty-hint">Selecciona clase y raza para ver los hechizos disponibles.</div></div>
   </div>
   <div class="config-panel">
     <h3>📋 Secuencia de Macro (suelta aquí)</h3>
-    <div class="sequence-zone" id="sequenceZone" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
-      <div class="empty-hint">Arrastra hechizos aquí para construir tu macro.<br>El orden importa: el primero se ejecutará primero.</div>
+    <div class="sequence-zone" id="sequenceZone" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)" aria-label="Secuencia de macro">
+      <div class="empty-hint">Arrastra hechizos aquí para construir tu macro.<br>El orden importa. Arrastra un slot para reordenar.</div>
     </div>
   </div>
   <div class="config-panel">
     <h3>🔧 Opciones de Comportamiento</h3>
     <div class="macro-options" id="macroOptions"></div>
+    <div id="cancelauraRow" class="inline-opt-row" style="display:none; margin-top:10px;">
+      <label for="cancelauraName">/cancelaura — nombre del aura/buff:</label>
+      <input type="text" id="cancelauraName" placeholder="Ej: Bloque de Hielo" oninput="persistState()" aria-label="Nombre del aura para /cancelaura" style="max-width:360px;">
+    </div>
     <div style="margin-top:15px;">
-      <label style="font-size:13px; color:var(--muted);">Modificadores de teclado (ramas condicionales reales):</label>
+      <label style="font-size:13px; color:var(--muted);">Modificadores de teclado (ramas condicionales reales; no se aplican a /castsequence):</label>
       <div class="modifier-row">
-        <label><input type="checkbox" id="modShift"> Shift</label>
-        <label><input type="checkbox" id="modCtrl"> Ctrl</label>
-        <label><input type="checkbox" id="modAlt"> Alt</label>
+        <label><input type="checkbox" id="modShift" onchange="persistState()"> Shift</label>
+        <label><input type="checkbox" id="modCtrl" onchange="persistState()"> Ctrl</label>
+        <label><input type="checkbox" id="modAlt" onchange="persistState()"> Alt</label>
       </div>
     </div>
   </div>
-  <div style="display:flex; gap:15px; align-items:center; flex-wrap:wrap;">
+  <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
     <button class="copy-btn cta-primary" onclick="generateMacro()" style="font-size:16px; padding:12px 30px;">⚡ Generar Macro</button>
-    <button class="copy-btn" onclick="copyMacro()" id="copyBtn" style="display:none;">📋 Copiar al portapapeles</button>
+    <button class="copy-btn" onclick="copyMacro()" id="copyBtn" style="display:none;">📋 Copiar solo el macro</button>
+    <span id="macroStatus" class="macro-status" aria-live="polite"></span>
   </div>
-  <div class="macro-output" id="macroOutput">Aquí aparecerá tu macro generada...</div>
+  <div class="macro-output-wrap">
+    <pre class="macro-output" id="macroOutput" aria-label="Macro generado">Aquí aparecerá tu macro generado...</pre>
+  </div>
+  <div id="macroWarnings" class="macro-warnings" style="display:none;" aria-live="polite"></div>
+  <div id="appToast" class="app-toast" role="status" aria-live="polite" aria-atomic="true"></div>
 </div>
 
 <!-- Talentos ocultos (conservado; no visible en UI) -->

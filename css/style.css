@@ -60,8 +60,10 @@ header.topbar::after{content:"";position:absolute;left:0;right:0;bottom:-1px;hei
 .topbar .spacer{flex:1}
 .topbar .tag{font:600 .74rem/1 var(--font-ui);color:var(--accent);padding:7px 12px;border-radius:var(--r-pill);
   background:var(--accent-softer);border:1px solid rgba(1,103,135,.14);
-  box-shadow:0 1px 0 rgba(255,255,255,.7) inset;transition:background var(--dur-1) var(--ease),border-color var(--dur-1) var(--ease),box-shadow var(--dur-1) var(--ease)}
+  box-shadow:0 1px 0 rgba(255,255,255,.7) inset;text-decoration:none;cursor:pointer;
+  transition:background var(--dur-1) var(--ease),border-color var(--dur-1) var(--ease),box-shadow var(--dur-1) var(--ease),transform var(--dur-1) var(--ease)}
 .topbar .tag:hover{background:var(--accent-soft);border-color:rgba(1,103,135,.22)}
+.topbar .tag:active{transform:var(--press)}
 
 /* Tabs (hidden) */
 .tabs{display:none}.tab-content{display:none;padding:28px 22px 40px;max-width:1120px;margin:0 auto;animation:rise var(--dur-3) var(--ease-out) both}
@@ -152,12 +154,34 @@ button.copy-btn[style*="font-size:16px"],.cta-primary{min-height:48px;padding:0 
 button.copy-btn[style*="font-size:16px"]:hover,.cta-primary:hover{background:var(--accent-hover);box-shadow:0 2px 4px rgba(0,0,0,.08),0 12px 28px rgba(1,103,135,.26);transform:translateY(-1px)}
 button.copy-btn[style*="font-size:16px"]:active,.cta-primary:active{background:var(--accent-press);transform:translateY(0) scale(.988);box-shadow:0 1px 2px rgba(0,0,0,.1),0 4px 12px rgba(1,103,135,.18)}
 
-/* ─── Output & notes ─── */
-.macro-output{position:relative;background:linear-gradient(180deg,#fff,#fafafc);border:1px solid var(--border);border-radius:16px;padding:18px;margin-top:16px;
+/* ─── Inline option, status, warnings, toast (Apple polish) ─── */
+.inline-opt-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px 14px;border-radius:14px;background:var(--bg-subtle);border:1px solid var(--border)}
+.inline-opt-row label{font:500 .86rem/1.3 var(--font-ui);color:var(--text-2)}
+.inline-opt-row input{flex:1 1 220px;min-height:40px}
+.macro-status{font:500 .84rem/1.2 var(--font-ui);color:var(--muted);padding:6px 2px;min-height:1.2em}
+.macro-status.ok{color:var(--ok)}.macro-status.warn{color:#b45309}.macro-status.err{color:var(--danger)}
+.macro-output-wrap{margin-top:12px}
+.macro-output{position:relative;background:linear-gradient(180deg,#fff,#fafafc);border:1px solid var(--border);border-radius:16px;padding:18px;margin:0;
   font:500 .9rem/1.6 ui-monospace,"SF Mono",SFMono-Regular,Menlo,Monaco,Consolas,monospace;color:#0f172a;white-space:pre-wrap;word-break:break-word;min-height:72px;
   box-shadow:var(--sh-xs),inset 0 1px 0 rgba(255,255,255,.9)}
-.macro-output::before{content:"Macro";position:absolute;top:10px;right:12px;font:600 .66rem/1 var(--font-ui);letter-spacing:.06em;text-transform:uppercase;color:var(--muted-2);
+.macro-output::before{content:"Macro (solo comandos)";position:absolute;top:10px;right:12px;font:600 .62rem/1 var(--font-ui);letter-spacing:.06em;text-transform:uppercase;color:var(--muted-2);
   background:var(--bg-muted);border:1px solid var(--hairline);padding:4px 8px;border-radius:999px}
+.macro-warnings{margin-top:10px;padding:12px 14px;border-radius:14px;border:1px solid rgba(180,83,9,.18);background:rgba(245,158,11,.08);color:#92400e;font:400 .84rem/1.45 var(--font-ui)}
+.macro-warnings strong{color:#78350f}.macro-warnings ul{margin:6px 0 0 18px}.macro-warnings li{margin:2px 0}
+.app-toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(10px);opacity:0;pointer-events:none;z-index:200;
+  background:rgba(29,29,31,.92);color:#f5f5f7;padding:11px 16px;border-radius:999px;font:500 .88rem/1.2 var(--font-ui);
+  box-shadow:var(--sh-fly);backdrop-filter:blur(16px) saturate(140%);-webkit-backdrop-filter:blur(16px) saturate(140%);
+  transition:opacity var(--dur-2) var(--ease),transform var(--dur-2) var(--ease);max-width:min(92vw,560px);text-align:center}
+.app-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.sequence-slot.dragging,.spell-item.dragging{opacity:.55;transform:scale(.98)}
+.sequence-slot.drag-over-slot{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.spell-item:focus-visible,.sequence-slot:focus-visible,.option-item:focus-within{outline:none;box-shadow:var(--focus)}
+.option-item{cursor:default}
+.option-item .option-help{margin-top:6px;font:400 .74rem/1.35 var(--font-ui);color:var(--muted);display:none}
+.option-item:focus-within .option-help,.option-item.show-help .option-help{display:block}
+.option-item[data-tooltip]:hover::after{display:none} /* replaced by focus/tap-friendly help */
+
+/* ─── Output & notes ─── */
 .data-note{display:flex;gap:10px;align-items:flex-start;background:var(--bg-subtle);border:1px solid var(--border);border-radius:14px;
   padding:12px 14px;font:400 .8rem/1.45 var(--font-ui);color:var(--text-2);margin-top:14px;box-shadow:var(--sh-xs)}
 .data-note::first-line{color:var(--text)}
