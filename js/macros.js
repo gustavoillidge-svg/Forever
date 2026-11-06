@@ -251,6 +251,7 @@ function isHarmful(ability) {
 function generateMacro() {
   if (sequence.length === 0) {
     document.getElementById('macroOutput').textContent = '⚠️ Añade al menos un hechizo a la secuencia.';
+    window.__lastMacroText = '';
     document.getElementById('copyBtn').style.display = 'none';
     return;
   }
@@ -324,13 +325,21 @@ function generateMacro() {
     });
   }
 
-  if (warnings.length) lines.push('', '# Advertencias:', ...warnings.map(w => '# - ' + w));
-  document.getElementById('macroOutput').textContent = lines.join('\n');
+  const macroText = lines.join('\n');
+  window.__lastMacroText = macroText; // solo macro (sin advertencias) para copiar
+  const out = warnings.length
+    ? macroText + '\n\n# Advertencias:\n' + warnings.map(w => '# - ' + w).join('\n')
+    : macroText;
+  document.getElementById('macroOutput').textContent = out;
   document.getElementById('copyBtn').style.display = 'inline-block';
 }
 
 function copyMacro() {
-  const text = document.getElementById('macroOutput').textContent;
+  let text = (typeof window.__lastMacroText === 'string') ? window.__lastMacroText : document.getElementById('macroOutput').textContent;
+  // Defensa: nunca copiar el bloque de advertencias; conservar #showtooltip y líneas válidas.
+  const cut = text.indexOf('\n# Advertencias:');
+  if (cut !== -1) text = text.slice(0, cut);
+  text = text.trimEnd();
   navigator.clipboard.writeText(text).then(() => {
     const btn = document.getElementById('copyBtn');
     const original = btn.textContent;
