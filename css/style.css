@@ -1,4 +1,4 @@
-/* WoW: Forever — dark fantasy (stone/leather, oro viejo/bronce, acento cian Skyborn) */
+﻿/* WoW: Forever — dark fantasy (stone/leather, oro viejo/bronce, acento cian Skyborn) */
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Roboto:wght@400;500;700&display=swap');
 :root{
   --bg-0:#0B0E14;--bg-1:#121721;--bg-2:#171d29;--panel:rgba(18,23,33,.92);--panel-solid:#141a24;
@@ -12,13 +12,13 @@ body{font-family:'Roboto','Helvetica Neue',Arial,sans-serif;color:var(--text);ba
 body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;
   background-image:radial-gradient(ellipse at top,rgba(73,199,216,.06),transparent 45%),repeating-linear-gradient(0deg,rgba(255,255,255,.015) 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,rgba(0,0,0,.08) 0 2px,transparent 2px 6px);opacity:.9}
 /* Topbar */
-header.topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:16px;padding:10px 22px;background:linear-gradient(180deg,rgba(18,23,33,.98),rgba(11,14,20,.96));border-bottom:1px solid var(--border-strong);box-shadow:0 4px 24px rgba(0,0,0,.7),inset 0 -1px 0 rgba(212,185,120,.08)}
+header.topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:16px;padding:10px 22px;background:#FFFFFF;border-bottom:2px solid #016787;box-shadow:0 2px 12px rgba(1,103,135,.12)}
 .brand{display:flex;align-items:center;gap:12px;text-decoration:none}
-.brand img{height:46px;width:auto;display:block;filter:drop-shadow(0 2px 8px rgba(0,0,0,.75))}
-.brand .brand-text{font-family:'Cinzel','Friz Quadrata',serif;font-weight:700;letter-spacing:.08em;font-size:1.05rem;color:var(--gold-light);text-shadow:2px 2px 4px rgba(0,0,0,.8)}
-.brand .brand-sub{display:block;font:500 .72rem 'Roboto',sans-serif;color:var(--muted);letter-spacing:.03em;text-shadow:none}
+.brand img{height:46px;width:auto;display:block;filter:none}
+.brand .brand-text{font-family:'Cinzel','Friz Quadrata',serif;font-weight:700;letter-spacing:.08em;font-size:1.05rem;color:#016787;text-shadow:1px 1px 2px rgba(1,103,135,.12)}
+.brand .brand-sub{display:block;font:500 .72rem 'Roboto',sans-serif;color:#4a6f82;letter-spacing:.03em;text-shadow:none}
 .topbar .spacer{flex:1}
-.topbar .tag{font-size:.75rem;color:var(--cyan);border:1px solid rgba(73,199,216,.35);padding:4px 10px;border-radius:999px;background:rgba(73,199,216,.08)}
+.topbar .tag{font-size:.75rem;color:#016787;border:1px solid rgba(1,103,135,.35);padding:4px 10px;border-radius:999px;background:rgba(1,103,135,.06)}
 /* Tabs (talentos oculto) */
 .tabs{display:none}
 .tab-content{display:none;padding:22px;max-width:1180px;margin:0 auto}
@@ -85,4 +85,6 @@ button.copy-btn[style*="font-size:16px"]:hover,.cta-primary:hover{filter:brightn
 ::-webkit-scrollbar-track{background:var(--bg-0)}
 ::-webkit-scrollbar-thumb{background:#3a4254;border-radius:6px;border:2px solid var(--bg-0)}
 ::-webkit-scrollbar-thumb:hover{background:var(--bronze)}
-@media (max-width:900px){header.topbar{padding:10px 14px;flex-wrap:wrap}.brand .brand-text{font-size:.95rem}.topbar .tag{display:none}.tab-content{padding:14px}.config-row{flex-direction:column;align-items:stretch}select,input[type="text"],input[type="number"]{width:100%;min-width:0}.talent-trees{flex-direction:column}}
+@media (max-width:900px){header.topbar{padding:10px 14px;flex-wrap:wrap}.brand .brand-text{font-family:'Cinzel','Friz Quadrata',serif;font-weight:700;letter-spacing:.08em;font-size:1.05rem;color:#016787;text-shadow:1px 1px 2px rgba(1,103,135,.12)}.topbar .tag{font-size:.75rem;color:#016787;border:1px solid rgba(1,103,135,.35);padding:4px 10px;border-radius:999px;background:rgba(1,103,135,.06)}.tab-content{padding:14px}.config-row{flex-direction:column;align-items:stretch}select,input[type="text"],input[type="number"]{width:100%;min-width:0}.talent-trees{flex-direction:column}}
+
+
