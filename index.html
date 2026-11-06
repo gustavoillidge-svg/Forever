@@ -3,75 +3,54 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WoW Forever - Herramienta de Macros y Talentos</title>
+<title>WoW Forever — Generador de Macros</title>
 <link rel="stylesheet" href="css/style.css">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0a0e14">
+<meta name="theme-color" content="#121721">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 </head>
 <body>
-<header>
-  <div class="logo">WOW <span>FOREVER</span></div>
-  <div class="subtitle">Herramienta comunitaria de Macros y Talentos · Datos no oficiales</div>
+<header class="topbar">
+  <a class="brand" href="#macros" aria-label="WoW Forever">
+    <img src="assets/logo.png" alt="WoW Forever" height="46">
+    <span class="brand-text">Generador de Macros<span class="brand-sub">Herramienta comunitaria · datos no oficiales</span></span>
+  </a>
+  <div class="spacer"></div>
+  <span class="tag">WoW Forever</span>
 </header>
 
-<div class="tabs">
-  <button class="tab-btn active" onclick="switchTab('macros')">⚔️ Generador de Macros</button>
-  <button class="tab-btn" onclick="switchTab('talents')">📜 Simulador de Talentos</button>
+<!-- Pestaña de talentos oculta: foco en generador de macros -->
+<div class="tabs" aria-hidden="true">
+  <button class="tab-btn active" onclick="switchTab('macros', event)">⚔️ Generador de Macros</button>
+  <button class="tab-btn" onclick="switchTab('talents', event)" style="display:none">📜 Simulador de Talentos</button>
 </div>
 
-<!-- ==================== PESTAÑA: GENERADOR DE MACROS ==================== -->
 <div id="tab-macros" class="tab-content active">
-
   <div class="config-panel">
     <h3>⚙️ Configuración del Personaje</h3>
     <div class="config-row">
-      <div class="config-group">
-        <label>Clase</label>
-        <select id="classSelect" onchange="onClassChange()">
-          <option value="">— Selecciona clase —</option>
-        </select>
-      </div>
-      <div class="config-group">
-        <label>Raza</label>
-        <select id="raceSelect" onchange="onRaceChange()">
-          <option value="">— Selecciona raza —</option>
-        </select>
-      </div>
-      <div class="config-group">
-        <label>Nivel (1-60)</label>
-        <input type="number" id="levelInput" min="1" max="60" value="60" onchange="onLevelChange()" style="min-width:100px;">
-      </div>
+      <div class="config-group"><label>Clase</label><select id="classSelect" onchange="onClassChange()"><option value="">— Selecciona clase —</option></select></div>
+      <div class="config-group"><label>Raza</label><select id="raceSelect" onchange="onRaceChange()"><option value="">— Selecciona raza —</option></select></div>
+      <div class="config-group"><label>Nivel (1-60)</label><input type="number" id="levelInput" min="1" max="60" value="60" onchange="onLevelChange()" style="min-width:100px;"></div>
     </div>
-    <div class="data-note">
-      ⚠️ Datos comunitarios basados en WoW Classic / Forever. Los nombres de hechizos y niveles de aprendizaje pueden variar. 
-      Esta herramienta no está afiliada a Blizzard Entertainment.
-    </div>
+    <div class="data-note">⚠️ Datos comunitarios (Classic/Forever). Nombres, niveles y disponibilidad pueden variar. Sin afiliación con Blizzard Entertainment. Elementos [VERIFICAR] requieren confirmación.</div>
   </div>
-
   <div class="config-panel">
     <h3>✨ Hechizos Disponibles (arrastra a la secuencia)</h3>
     <input type="text" id="spellSearch" placeholder="Buscar hechizo (ES/EN)..." oninput="filterSpellPool()" style="width:100%;margin-bottom:8px;">
-    <div class="spell-pool" id="spellPool">
-      <div class="empty-hint">Selecciona clase y raza para ver los hechizos disponibles.</div>
-    </div>
+    <div class="spell-pool" id="spellPool"><div class="empty-hint">Selecciona clase y raza para ver los hechizos disponibles.</div></div>
   </div>
-
   <div class="config-panel">
     <h3>📋 Secuencia de Macro (suelta aquí)</h3>
     <div class="sequence-zone" id="sequenceZone" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
       <div class="empty-hint">Arrastra hechizos aquí para construir tu macro.<br>El orden importa: el primero se ejecutará primero.</div>
     </div>
   </div>
-
   <div class="config-panel">
     <h3>🔧 Opciones de Comportamiento</h3>
-    <div class="macro-options" id="macroOptions">
-      <!-- Se genera dinámicamente con JS -->
-    </div>
-
+    <div class="macro-options" id="macroOptions"></div>
     <div style="margin-top:15px;">
-      <label style="font-size:13px; color:var(--text-muted);">Modificadores de teclado (añaden ramas condicionales):</label>
+      <label style="font-size:13px; color:var(--muted);">Modificadores de teclado (ramas condicionales reales):</label>
       <div class="modifier-row">
         <label><input type="checkbox" id="modShift"> Shift</label>
         <label><input type="checkbox" id="modCtrl"> Ctrl</label>
@@ -79,50 +58,23 @@
       </div>
     </div>
   </div>
-
   <div style="display:flex; gap:15px; align-items:center; flex-wrap:wrap;">
-    <button class="copy-btn" onclick="generateMacro()" style="font-size:16px; padding:12px 30px;">⚡ Generar Macro</button>
+    <button class="copy-btn cta-primary" onclick="generateMacro()" style="font-size:16px; padding:12px 30px;">⚡ Generar Macro</button>
     <button class="copy-btn" onclick="copyMacro()" id="copyBtn" style="display:none;">📋 Copiar al portapapeles</button>
   </div>
-
   <div class="macro-output" id="macroOutput">Aquí aparecerá tu macro generada...</div>
-
 </div>
 
-<!-- ==================== PESTAÑA: SIMULADOR DE TALENTOS ==================== -->
-<div id="tab-talents" class="tab-content">
-
-  <div class="config-panel">
-    <h3>⚙️ Configuración de Talentos</h3>
+<!-- Talentos ocultos (conservado; no visible en UI) -->
+<div id="tab-talents" class="tab-content" aria-hidden="true">
+  <div class="config-panel"><h3>⚙️ Configuración de Talentos</h3>
     <div class="config-row">
-      <div class="config-group">
-        <label>Clase</label>
-        <select id="talentClassSelect" onchange="onTalentClassChange()">
-          <option value="">— Selecciona clase —</option>
-        </select>
-      </div>
-      <div class="config-group">
-        <label>Nivel (10-60)</label>
-        <input type="number" id="talentLevelInput" min="10" max="60" value="60" onchange="onTalentLevelChange()" style="min-width:100px;">
-      </div>
+      <div class="config-group"><label>Clase</label><select id="talentClassSelect" onchange="onTalentClassChange()"><option value="">— Selecciona clase —</option></select></div>
+      <div class="config-group"><label>Nivel (10-60)</label><input type="number" id="talentLevelInput" min="10" max="60" value="60" onchange="onTalentLevelChange()" style="min-width:100px;"></div>
     </div>
     <div class="points-remaining" id="pointsRemaining">Puntos disponibles: 51</div>
-    <div class="data-note">
-      ⚠️ Los árboles de talentos son una representación simplificada basada en datos comunitarios de WoW Forever. 
-      No reflejan necesariamente el estado final del servidor. Las descripciones son orientativas.
-    </div>
   </div>
-
-  <div class="talent-container">
-    <div class="talent-trees" id="talentTrees">
-      <div class="empty-hint" style="width:100%;">Selecciona una clase para ver sus talentos.</div>
-    </div>
-    <div class="talent-info-panel" id="talentInfoPanel">
-      <h4>Información del Talento</h4>
-      <div class="talent-desc">Pasa el mouse sobre un talento para ver su descripción y lo que aporta.</div>
-    </div>
-  </div>
-
+  <div class="talent-container"><div class="talent-trees" id="talentTrees"></div><div class="talent-info-panel" id="talentInfoPanel"><h4>Información del Talento</h4><div class="talent-desc">Selecciona un talento.</div></div></div>
 </div>
 
 <script src="js/data.js"></script>
