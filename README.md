@@ -39,6 +39,8 @@ Abre `index.html` en el navegador o despliega el proyecto en un servidor web est
 
 Los recursos estáticos (iconos, imágenes y catálogos) se encuentran en `assets/` y `icons/`.
 
+> **Nota:** Consulta `assets/icons/catalog/` para el índice completo de iconos de Wowhead.
+
 ## Licencia
 
 MIT
