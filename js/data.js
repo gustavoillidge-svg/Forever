@@ -1,8 +1,13 @@
-// ==================== DATOS EMBEBIDOS ====================
+// ==================== DATOS DINÁMICOS — WoW Forever ====================
+// Capa de acceso a datos con caché localStorage (24h) y fallback a datos embebidos.
+// Fuente principal: Forever News Data API (https://wowforever.news/api-docs.html)
+// Fuente de respaldo: ForeverDB API (requiere API key, https://foreverdb.net/developers)
 
-// Iconos base (usando Wowhead CDN con IDs de hechizos conocidos)
-// Para producción, idealmente usar nombres de iconos exactos. Aquí usamos IDs de hechizos clásicos.
+const FOREVER_NEWS_BASE = 'https://wowforever.news';
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 horas
+const CACHE_PREFIX = 'wf_cache_';
 
+// -------------------- Clases y razas (configuración estática) --------------------
 const CLASSES = {
   warrior: { name: 'Guerrero', nameEn: 'Warrior', color: '#C79C6E', icon: 'ability_warrior_savageblow' },
   paladin: { name: 'Paladín', nameEn: 'Paladin', color: '#F58CBA', icon: 'ability_paladin_blessedmending' },
@@ -20,365 +25,590 @@ const RACES = {
   dwarf: { name: 'Enano', nameEn: 'Dwarf', faction: 'alliance', icon: 'achievement_character_dwarf_male' },
   nightelf: { name: 'Elfo de la Noche', nameEn: 'Night Elf', faction: 'alliance', icon: 'achievement_character_nightelf_male' },
   gnome: { name: 'Gnomo', nameEn: 'Gnome', faction: 'alliance', icon: 'achievement_character_gnome_male' },
-  draenei: { name: 'Draenei (Forever, si aplica)', nameEn: 'Draenei', faction: 'alliance', icon: 'achievement_character_draenei_male' },
   orc: { name: 'Orco', nameEn: 'Orc', faction: 'horde', icon: 'achievement_character_orc_male' },
   undead: { name: 'No-Muerto', nameEn: 'Undead', faction: 'horde', icon: 'achievement_character_undead_male' },
   tauren: { name: 'Tauren', nameEn: 'Tauren', faction: 'horde', icon: 'achievement_character_tauren_male' },
   troll: { name: 'Trol', nameEn: 'Troll', faction: 'horde', icon: 'achievement_character_troll_male' },
-  bloodelf: { name: 'Elfo de Sangre (Forever, si aplica)', nameEn: 'Blood Elf', faction: 'horde', icon: 'achievement_character_bloodelf_male' },
-  skyborne_alliance: { name: 'Nacido del Cielo — Orden Suprema (Alianza)', nameEn: 'Skyborne — High Order (Alliance)', faction: 'alliance', icon: 'ability_druid_flightform' },
-  skyborne_horde: { name: 'Nacido del Cielo — Moldeavientos (Horda)', nameEn: 'Skyborne — Windshaper (Horde)', faction: 'horde', icon: 'ability_druid_flightform' }
+  skyborne_alliance: { name: 'Cielonato de la Orden Eminente', nameEn: 'High Order Skyborne', faction: 'alliance', icon: 'ability_skyborne_walkonair' },
+  skyborne_horde: { name: 'Cielonato Formavientos', nameEn: 'Windshaper Skyborne', faction: 'horde', icon: 'spell_nature_skysight' }
 };
 
-// Raciales (habilidades activas que se pueden usar en macros)
-const RACIALS = {
+// Combinaciones raza↔clase (WoW Forever — build 1.60.1.70790, 56 combinaciones)
+// Fuente: Wowhead Forever, endgametools, method.gg, warcrafttavern — 6 nuevas vs Classic:
+// humano cazador, enano chamán, gnomo sacerdote, orco mago, trol brujo, no-muerto paladín.
+// Skyborne: mago solo Alianza, chamán solo Horda; ambos: guerrero, cazador, pícaro, druida.
+const RACE_CLASSES = {
+  human: ['warrior','paladin','rogue','priest','mage','warlock','hunter'],
+  dwarf: ['warrior','paladin','hunter','priest','rogue','shaman'],
+  nightelf: ['warrior','hunter','rogue','priest','druid'],
+  gnome: ['warrior','rogue','mage','warlock','priest'],
+  orc: ['warrior','hunter','rogue','shaman','warlock','mage'],
+  undead: ['warrior','rogue','priest','mage','warlock','paladin'],
+  tauren: ['warrior','hunter','shaman','druid'],
+  troll: ['warrior','hunter','rogue','priest','shaman','mage','warlock'],
+  skyborne_alliance: ['warrior','hunter','rogue','mage','druid'],
+  skyborne_horde: ['warrior','hunter','rogue','shaman','druid']
+};
+
+// -------------------- Raciales (WoW Forever — 2 activas + 2 pasivas por raza) --------------------
+// Fuente: Wowhead Forever guide, endgametools, warcrafttavern — build 1.60.1.70790
+const RACIALS_STATIC = {
   human: [
-    { name: 'Percepción', nameEn: 'Perception', level: 1, icon: 'spell_nature_abolishmagic', desc: 'Aumenta la detección de sigilo.' },
-    { name: 'Voluntad de los Renegados', nameEn: 'Will to Survive', level: 1, icon: 'spell_holy_sealofvalor', desc: 'Elimina efectos de control.' },
-    { name: 'Especialización en Espadas', nameEn: 'Sword Specialization', level: 1, icon: 'ability_meleedamage', desc: 'Pasiva: +2% crítico con espadas.' },
-    { name: 'Espíritu Humano', nameEn: 'The Human Spirit', level: 1, icon: 'spell_holy_holyprotection', desc: 'Pasiva: +5% espíritu.' }
+    { name: 'Percepción', nameEn: 'Perception', level: 1, icon: 'spell_nature_abolishmagic', desc: 'Detecta enemigos sigilados durante 20 s.' },
+    { name: 'Sobrevivir', nameEn: 'Will to Survive', level: 1, icon: 'spell_holy_dispelmagic', desc: 'Elimina efectos de Aturdir. CD 3 min.' },
+    { name: 'Despiadado', nameEn: 'Ruthless', level: 1, icon: 'ability_meleedamage', desc: 'Pasiva: +1% probabilidad de crítico con hechizos y habilidades.' },
+    { name: 'Espíritu Humano', nameEn: 'The Human Spirit', level: 1, icon: 'spell_holy_holyprotection', desc: 'Pasiva: Espíritu +10%.' }
   ],
   dwarf: [
-    { name: 'Forma de Piedra', nameEn: 'Stoneform', level: 1, icon: 'spell_shadow_unholystrength', desc: 'Inmunidad a sangrado, veneno y enfermedad.' },
-    { name: 'Especialización en Mazas', nameEn: 'Mace Specialization', level: 1, icon: 'inv_mace_01', desc: 'Pasiva: +1% daño con mazas.' },
+    { name: 'Forma de Piedra', nameEn: 'Stoneform', level: 1, icon: 'spell_shadow_unholystrength', desc: 'Elimina y otorga inmunidad a Sangrado, Veneno y Enfermedad, reduce daño físico 10% durante 8 s.' },
     { name: 'Cazador de Bestias', nameEn: 'Big Game Hunter', level: 1, icon: 'ability_hunter_snipershot', desc: 'Pasiva: +5% daño a bestias.' },
+    { name: 'Precisión del Artesano', nameEn: "Artisan's Precision", level: 1, icon: 'trade_engineering', desc: 'Pasiva: +1% probabilidad de golpe con hechizos y ataques.' },
     { name: 'Encontrar Tesoro', nameEn: 'Find Treasure', level: 1, icon: 'spell_nature_magicimmunity', desc: 'Detecta cofres cercanos.' }
   ],
   nightelf: [
-    { name: 'Luz de Elune', nameEn: "Elune's Light", level: 1, icon: 'spell_holy_moonfire', desc: '+10% crítico durante 15s.' },
-    { name: 'Fusión con las Sombras', nameEn: 'Shadowmeld', level: 1, icon: 'ability_stealth', desc: 'Sigilo mientras está quieto.' },
-    { name: 'Rapidez', nameEn: 'Quickness', level: 1, icon: 'ability_rogue_sprint', desc: 'Pasiva: +1% esquiva, +2% velocidad.' },
-    { name: 'Espíritu de Fuego Fatuo', nameEn: 'Wisp Spirit', level: 1, icon: 'spell_nature_wispsplode', desc: 'Pasiva: velocidad en forma de fuego fatuo.' }
+    { name: 'Luz de Elune', nameEn: "Elune's Light", level: 1, icon: 'spell_holy_moonfire', desc: '+10% crítico durante 15 s.' },
+    { name: 'Fusión con las Sombras', nameEn: 'Shadowmeld', level: 1, icon: 'ability_stealth', desc: 'Sigilo mientras estás quieto.' },
+    { name: 'Rapidez', nameEn: 'Quickness', level: 1, icon: 'ability_rogue_sprint', desc: 'Pasiva: +1% esquiva, +2% velocidad de movimiento.' },
+    { name: 'Espíritu de Fuego Fatuo', nameEn: 'Wisp Spirit', level: 1, icon: 'spell_nature_wispsplode', desc: 'Pasiva: al morir, te transformas en fuego fatuo (+75% velocidad).' }
   ],
   gnome: [
     { name: 'Escapista', nameEn: 'Escape Artist', level: 1, icon: 'ability_rogue_sprint', desc: 'Libera de inmovilización y ralentización.' },
-    { name: '¡Eureka!', nameEn: 'Eureka!', level: 1, icon: 'spell_arcane_arcane01', desc: 'Reduce costos y +10% daño/curación en 3 habilidades.' },
-    { name: 'Mente Expansiva', nameEn: 'Expansive Mind', level: 1, icon: 'spell_arcane_arcane03', desc: 'Pasiva: +5% maná/ira/energía.' },
-    { name: 'Especialización en Ingeniería', nameEn: 'Engineering Specialization', level: 1, icon: 'trade_engineering', desc: 'Pasiva: +15 habilidad ingeniería.' }
+    { name: '¡Eureka!', nameEn: 'Eureka!', level: 1, icon: 'spell_arcane_arcane01', desc: 'Reduce costos y +10% daño durante 8 s.' },
+    { name: 'Mente Expansiva', nameEn: 'Expansive Mind', level: 1, icon: 'spell_arcane_arcane03', desc: 'Pasiva: +5% maná/ira/energía máxima.' },
+    { name: 'Especialización en Ingeniería', nameEn: 'Engineering Specialization', level: 1, icon: 'trade_engineering', desc: 'Pasiva: Dispositivos de ingeniería más fiables.' }
   ],
   orc: [
-    { name: 'Furia Sangrienta', nameEn: 'Blood Fury', level: 1, icon: 'spell_shadow_bloodboil', desc: '+10% ataque y hechizos durante 15s.' },
-    { name: 'Romper Maldición', nameEn: 'Shatter Curse', level: 1, icon: 'spell_shadow_antimagicshell', desc: 'Inmunidad a maldiciones 8s.' },
-    { name: 'Especialización en Hachas', nameEn: 'Axe Specialization', level: 1, icon: 'inv_axe_01', desc: 'Pasiva: +1% crítico con hachas.' },
-    { name: 'Dureza', nameEn: 'Hardiness', level: 1, icon: 'spell_nature_stoneclawtotem', desc: 'Pasiva: -20% duración de aturdimiento.' }
+    { name: 'Furia Sangrienta', nameEn: 'Blood Fury', level: 1, icon: 'spell_shadow_bloodboil', desc: '+10% poder de ataque y poder de hechizo durante 15 s. CD 2 min.' },
+    { name: 'Romper Maldición', nameEn: 'Shatter Curse', level: 1, icon: 'spell_shadow_antimagicshell', desc: 'Inmunidad a maldiciones y reduce daño mágico 5% durante 8 s.' },
+    { name: 'Dureza', nameEn: 'Hardiness', level: 1, icon: 'spell_nature_stoneclawtotem', desc: 'Pasiva: -20% duración de aturdimiento.' },
+    { name: 'Comando', nameEn: 'Command', level: 1, icon: 'ability_hunter_snipershot', desc: 'Pasiva: +5% daño de mascota (Brujo y Cazador).' }
   ],
   undead: [
-    { name: 'Toque de la Tumba', nameEn: 'Touch of the Grave', level: 1, icon: 'spell_shadow_lifedrain', desc: 'Roba vida con ataques.' },
-    { name: 'Voluntad de los Renegados', nameEn: 'Will of the Forsaken', level: 1, icon: 'spell_shadow_raiseundead', desc: 'Libera de encanto, miedo y sueño.' },
-    { name: 'Canibalismo', nameEn: 'Cannibalize', level: 1, icon: 'ability_creature_cursed_02', desc: 'Come cadáveres para curar.' },
-    { name: 'Respiración Subacuática', nameEn: 'Underwater Breathing', level: 1, icon: 'spell_shadow_demonbreath', desc: 'Pasiva: respiración prolongada.' }
+    { name: 'Toque de la Tumba', nameEn: 'Touch of the Grave', level: 1, icon: 'spell_shadow_lifedrain', desc: '20% probabilidad de drenar Salud al objetivo (hasta 5% de tu vida máxima). ICD 15 s.' },
+    { name: 'Voluntad de los Renegados', nameEn: 'Will of the Forsaken', level: 1, icon: 'spell_shadow_raiseundead', desc: 'Elimina efectos de Encanto, Miedo y Sueño.' },
+    { name: 'Respiración Subacuática', nameEn: 'Underwater Breathing', level: 1, icon: 'spell_shadow_demonbreath', desc: 'Pasiva: la respiración bajo el agua dura 300% más.' },
+    { name: 'Canibalismo', nameEn: 'Cannibalize', level: 1, icon: 'ability_creature_cursed_02', desc: 'Regenera 7% Vida y Maná cada 2 s durante 10 s sobre cadáveres.' }
   ],
   tauren: [
-    { name: 'Carrera de la Llanura', nameEn: 'Plainsrunning', level: 1, icon: 'ability_racial_plainsrunning', desc: 'Velocidad aumenta con el tiempo corriendo.' },
-    { name: 'Cultivo', nameEn: 'Cultivation', level: 1, icon: 'spell_nature_naturetouchgrow', desc: 'Recolecta hierbas adicionales.' },
-    { name: 'Aguante', nameEn: 'Endurance', level: 1, icon: 'spell_nature_reincarnation', desc: 'Pasiva: +5% vida, +1% golpe.' },
-    { name: 'Pisotón de Guerra', nameEn: 'War Stomp', level: 1, icon: 'ability_warstomp', desc: 'Aturde enemigos cercanos 2s.' }
+    { name: 'Carrera de la Llanura', nameEn: 'Plainsrunning', level: 1, icon: 'ability_racial_plainsrunning', desc: 'Velocidad aumenta un 2% por pila al moverse, hasta 60%.' },
+    { name: 'Cultivo', nameEn: 'Cultivation', level: 1, icon: 'spell_nature_naturetouchgrow', desc: 'Recolecta hierbas adicionales sin Herboristería.' },
+    { name: 'Aguante', nameEn: 'Endurance', level: 1, icon: 'spell_nature_reincarnation', desc: 'Pasiva: Vida total +5%.' },
+    { name: 'Pisotón de Guerra', nameEn: 'War Stomp', level: 1, icon: 'ability_warstomp', desc: 'Aturde hasta 5 enemigos cercanos durante 2 s. CD 1.5 min.' }
   ],
   troll: [
-    { name: 'Berserker', nameEn: 'Berserking', level: 1, icon: 'racial_troll_berserk', desc: '+10-30% velocidad de ataque según vida.' },
-    { name: 'Regeneración', nameEn: 'Regeneration', level: 1, icon: 'spell_nature_regeneration', desc: 'Pasiva: +10% regeneración de vida.' },
-    { name: 'Lanzador de Hachas', nameEn: 'Throwing Specialization', level: 1, icon: 'inv_weapon_halberd_04', desc: 'Pasiva: +1% crítico con armas arrojadizas.' },
-    { name: 'Matar Bestias', nameEn: 'Beast Slaying', level: 1, icon: 'ability_hunter_snipershot', desc: 'Pasiva: +5% daño a bestias.' }
+    { name: 'Rabiar', nameEn: 'Berserking', level: 1, icon: 'racial_troll_berserk', desc: '+10% velocidad de ataque y hechizo durante 15 s.' },
+    { name: 'Regeneración', nameEn: 'Regeneration', level: 1, icon: 'spell_nature_regeneration', desc: 'Pasiva: +20% regeneración de vida, continua en combate.' },
+    { name: 'Matar Bestias', nameEn: 'Beast Slaying', level: 1, icon: 'ability_hunter_snipershot', desc: 'Pasiva: +5% daño a bestias.' },
+    { name: 'Regeneración Rápida', nameEn: 'Rapid Regeneration', level: 1, icon: 'spell_nature_regeneration', desc: 'Regenera 50% de la Vida máxima a lo largo del tiempo.' }
   ],
-  draenei: [
-    { name: 'Don de los Naaru', nameEn: 'Gift of the Naaru', level: 1, icon: 'spell_holy_holyprotection', desc: '[VERIFICAR Forever] Curación HoT racial (referencia TBC).' },
-    { name: 'Presencia Heroica', nameEn: 'Heroic Presence', level: 1, icon: 'inv_helmet_21', desc: '[VERIFICAR Forever] Bono de golpe racial (referencia TBC).' }
-  ],
-  bloodelf: [
-    { name: 'Torrente Arcano', nameEn: 'Arcane Torrent', level: 1, icon: 'spell_shadow_teleport', desc: '[VERIFICAR Forever] Silencio/recupera recurso (referencia TBC).' }
-  ],
-  // Skyborne / Nacidos del Cielo (WoW Forever, razas nuevas). Datos orientativos basados en guías públicas (Wowhead/Icy Veins/foreverdb); [VERIFICAR] nombres exactos en cliente ES.
   skyborne_alliance: [
-    { name: 'Bendición de la Corona', nameEn: 'Crown\'s Blessing', level: 1, icon: 'spell_holy_innerfire', desc: '[VERIFICAR] Activa: beneficio defensivo/soporte (High Order).' },
-    { name: 'Postura Real', nameEn: 'Royal Poise', level: 1, icon: 'spell_holy_sealofwisdom', desc: '[VERIFICAR] Pasiva: afinidad a maná/curación o utilidad (High Order).' },
-    { name: 'Plumaje Resistente', nameEn: 'Feathered Fortitude', level: 1, icon: 'inv_misc_feather_01', desc: '[VERIFICAR] Pasiva racial Skyborne.' },
-    { name: 'Deslizamiento Aéreo', nameEn: 'Aerial Glide', level: 1, icon: 'ability_druid_flightform', desc: '[VERIFICAR] Movilidad/caída controlada racial Skyborne.' }
+    { name: 'Ascenso de ráfaga', nameEn: 'Gust Ascent', level: 1, icon: 'ability_skyborne_walkonair', desc: 'Planea hacia abajo durante 10 s. CD 1.5 min.' },
+    { name: 'Leer Línea Ley', nameEn: 'Read Ley Line', level: 1, icon: 'spell_arcane_leyline', desc: 'Regen Vida/Maná +50% durante 15 s. En Línea Ley: +100%. No usable con Innervar activa.' },
+    { name: 'Bendición del Viento', nameEn: 'Wind Blessed', level: 1, icon: 'spell_nature_windblessed', desc: 'Pasiva: +2% celeridad melee, a distancia y hechizos.' },
+    { name: 'Perspicacia Elemental', nameEn: 'Elemental Insight', level: 1, icon: 'spell_nature_elementalinsight', desc: 'Pasiva: +5% daño a elementales.' }
   ],
   skyborne_horde: [
-    { name: 'Impulso del Vendaval', nameEn: 'Gale Surge', level: 1, icon: 'spell_nature_cyclone', desc: '[VERIFICAR] Activa: ráfaga de velocidad/daño o utilidad (Windshaper).' },
-    { name: 'Instinto de Tormenta', nameEn: 'Storm Instinct', level: 1, icon: 'spell_nature_lightning', desc: '[VERIFICAR] Pasiva: afinidad ofensiva/utilidad (Windshaper).' },
-    { name: 'Plumaje Resistente', nameEn: 'Feathered Fortitude', level: 1, icon: 'inv_misc_feather_01', desc: '[VERIFICAR] Pasiva racial Skyborne.' },
-    { name: 'Deslizamiento Aéreo', nameEn: 'Aerial Glide', level: 1, icon: 'ability_druid_flightform', desc: '[VERIFICAR] Movilidad/caída controlada racial Skyborne.' }
+    { name: 'Ascenso de ráfaga', nameEn: 'Gust Ascent', level: 1, icon: 'spell_nature_skysight', desc: 'Planea hacia abajo durante 10 s. CD 1.5 min.' },
+    { name: 'Visión del Cielo', nameEn: 'Skysight', level: 1, icon: 'spell_nature_skysight', desc: 'Bendición Elemental +15% velocidad de movimiento durante 15 s. En convergencia elemental: +30% durante 1 h.' },
+    { name: 'Bendición del Viento', nameEn: 'Wind Blessed', level: 1, icon: 'spell_nature_windblessed', desc: 'Pasiva: +2% celeridad melee, a distancia y hechizos.' },
+    { name: 'Perspicacia Elemental', nameEn: 'Elemental Insight', level: 1, icon: 'spell_nature_elementalinsight', desc: 'Pasiva: +5% daño a elementales.' }
   ]
 };
 
-// Hechizos por clase (basado en WoW Classic/Forever, nivel de aprendizaje)
-// Nota: Lista simplificada de habilidades activas relevantes para macros.
-// Los niveles son aproximados según datos comunitarios.
-const SPELLS = {
+// -------------------- DataService --------------------
+const DataService = (function () {
+const cache = {};
+const pendingAborts = {};
+
+function abortEndpoint(endpoint) {
+  if (pendingAborts[endpoint]) { try { pendingAborts[endpoint](); } catch (e) {} pendingAborts[endpoint] = null; }
+}
+
+function cacheKey(endpoint) {
+    return CACHE_PREFIX + endpoint.replace(/[^a-z0-9]/gi, '_');
+  }
+
+  function getCached(endpoint) {
+    try {
+      const raw = localStorage.getItem(cacheKey(endpoint));
+      if (!raw) return null;
+      const data = JSON.parse(raw);
+      if (Date.now() - data.ts < CACHE_TTL_MS) return data.value;
+      localStorage.removeItem(cacheKey(endpoint));
+      return null;
+    } catch (e) { return null; }
+  }
+
+  function setCached(endpoint, value) {
+    try {
+      localStorage.setItem(cacheKey(endpoint), JSON.stringify({ ts: Date.now(), value: value }));
+    } catch (e) {}
+  }
+
+async function fetchJson(url, signal) {
+  const resp = await fetch(url, { cache: 'no-store', signal });
+  if (!resp.ok) throw new Error(`HTTP ${resp.status} for ${url}`);
+  return resp.json();
+}
+
+  // Transform an API spell record to app format
+  function normalizeSpell(rec, macroLang) {
+    const name = rec.name || '';
+    return {
+      name: name,
+      nameEn: rec.nameEn || name,
+      level: rec.level || 1,
+      icon: rec.icon || 'inv_misc_questionmark',
+      desc: rec.text || '',
+      type: 'spell',
+      kind: rec.kind || 'spell'
+    };
+  }
+
+  // Transform an API talent record to app format
+  function normalizeTalent(rec, macroLang) {
+    const maxRank = rec.ranks || 1;
+    return {
+      name: rec.name || '',
+      nameEn: rec.nameEn || rec.name || '',
+      maxRank: maxRank,
+      desc: rec.text || '',
+      benefit: rec.text || '',
+      tree: rec.tree || '',
+      row: rec.row || 1,
+      col: rec.col || 1,
+      points: rec.points || null,
+      requires: rec.requires || [],
+      icon: rec.icon || 'inv_misc_questionmark',
+      level: rec.level || null,
+      spell: rec.spell || null
+    };
+  }
+
+  return {
+    // ---------- Spells ----------
+    async getSpells(classKey, macroLang = 'es') {
+      const embedded = (EMBEDDED_SPELLS[classKey] || []).map(s => ({ ...s, type: 'spell' }));
+      const embeddedNames = new Set(embedded.map(s => (s.nameEn || s.name || '').toLowerCase()));
+      const endpoint = `/api/v1/spells?class=${encodeURIComponent(classKey)}&limit=200`;
+      abortEndpoint(endpoint);
+      const controller = new AbortController();
+      pendingAborts[endpoint] = () => controller.abort();
+      const cached = getCached(endpoint);
+      let records;
+      if (cached) {
+        records = cached;
+      } else {
+        try {
+          const data = await fetchJson(FOREVER_NEWS_BASE + endpoint, controller.signal);
+          records = data.results || data.result || [];
+          setCached(endpoint, records);
+        } catch (e) {
+          if (e.name === 'AbortError') { return embedded; }
+          console.warn('Forex News API failed for spells', classKey, e);
+          records = null;
+        }
+      }
+      pendingAborts[endpoint] = null;
+      if (!records || records.length === 0) {
+        return embedded;
+      }
+      const apiSpells = records.map(rec => normalizeSpell(rec, macroLang));
+      const additional = apiSpells.filter(s => !embeddedNames.has((s.nameEn || s.name || '').toLowerCase()));
+      return [...embedded, ...additional];
+    },
+
+    // ---------- Racials ----------
+    async getRacials(raceKey, macroLang = 'es') {
+      const embedded = (RACIALS_STATIC[raceKey] || []).map(r => ({ ...r, type: 'racial' }));
+      const endpoint = `/api/v1/racials?race=${encodeURIComponent(raceKey)}`;
+      abortEndpoint(endpoint);
+      const controller = new AbortController();
+      pendingAborts[endpoint] = () => controller.abort();
+      const cached = getCached(endpoint);
+      let records;
+      if (cached) {
+        records = cached;
+      } else {
+        try {
+          const data = await fetchJson(FOREVER_NEWS_BASE + endpoint, controller.signal);
+          records = data.results || data.result || [];
+          setCached(endpoint, records);
+        } catch (e) {
+          if (e.name === 'AbortError') { return embedded; }
+          console.warn('Forex News API failed for racials', raceKey, e);
+          records = null;
+        }
+      }
+      pendingAborts[endpoint] = null;
+      if (!records || records.length === 0) {
+        return embedded;
+      }
+      const apiRacials = records.map(rec => normalizeSpell(rec, macroLang));
+      const embeddedNames = new Set(embedded.map(r => (r.nameEn || r.name || '').toLowerCase()));
+      const additional = apiRacials.filter(r => !embeddedNames.has((r.nameEn || r.name || '').toLowerCase()));
+      return [...embedded, ...additional];
+    },
+
+    // ---------- Talents ----------
+    async getTalents(classKey) {
+      const endpoint = `/api/v1/talents?class=${encodeURIComponent(classKey)}&limit=300`;
+      abortEndpoint(endpoint);
+      const controller = new AbortController();
+      pendingAborts[endpoint] = () => controller.abort();
+      const cached = getCached(endpoint);
+      let records;
+      if (cached) {
+        records = cached;
+      } else {
+        try {
+          const data = await fetchJson(FOREVER_NEWS_BASE + endpoint, controller.signal);
+          records = data.results || data.result || [];
+          setCached(endpoint, records);
+        } catch (e) {
+          if (e.name === 'AbortError') { return EMBEDDED_TALENTS[classKey] || { trees: [] }; }
+          console.warn('Forex News API failed for talents', classKey, e);
+          records = null;
+        }
+      }
+      pendingAborts[endpoint] = null;
+      if (!records || records.length === 0) {
+        return EMBEDDED_TALENTS[classKey] || { trees: [] };
+      }
+
+      const treesMap = {};
+      records.forEach(rec => {
+        const tree = rec.tree || 'Unknown';
+        if (!treesMap[tree]) treesMap[tree] = [];
+        treesMap[tree].push(normalizeTalent(rec));
+      });
+
+      const trees = Object.entries(treesMap).map(([treeName, talents]) => ({
+        name: treeName,
+        nameEn: treeName,
+        talents: talents.sort((a, b) => (a.row || 0) - (b.row || 0) || (a.col || 0) - (b.col || 0))
+      }));
+
+      return { trees };
+    },
+
+    // ---------- Icon URL ----------
+    iconUrl(iconName) {
+      if (!iconName) return 'https://wowforever.news/icons/inv_misc_questionmark.png';
+      return `https://wowforever.news/icons/${iconName}.png`;
+    },
+
+    // ---------- Prefetch all data for a class ----------
+    async prefetchClass(classKey, macroLang = 'es') {
+      await Promise.all([
+        this.getSpells(classKey, macroLang),
+        this.getTalents(classKey)
+      ]);
+    },
+
+    // ---------- Clear cache ----------
+    clearCache() {
+      Object.keys(localStorage).forEach(k => {
+        if (k.startsWith(CACHE_PREFIX)) localStorage.removeItem(k);
+      });
+    }
+  };
+})();
+
+// -------------------- Embedded fallback data --------------------
+const EMBEDDED_SPELLS = {
   warrior: [
+    { name: 'Golpe Heroico', nameEn: 'Heroic Strike', level: 1, icon: 'ability_rogue_ambush' },
+    { name: 'Grito de Batalla', nameEn: 'Battle Shout', level: 1, icon: 'ability_warrior_battleshout' },
+    { name: 'Actitud de batalla', nameEn: 'Battle Stance', level: 1, icon: 'ability_warrior_offensivestance' },
     { name: 'Carga', nameEn: 'Charge', level: 4, icon: 'ability_warrior_charge' },
-    { name: 'Golpe Heroico', nameEn: 'Heroic Strike', level: 1, icon: 'ability_rogue_heroicstrike' },
-    { name: 'Grito de Batalla', nameEn: 'Battle Shout', level: 2, icon: 'ability_warrior_battleshout' },
-    { name: 'Rendir', nameEn: 'Rend', level: 4, icon: 'ability_gouge' },
+    { name: 'Desgarrar', nameEn: 'Rend', level: 4, icon: 'ability_gouge' },
+    { name: 'Disparo de advertencia', nameEn: 'Mocking Blow', level: 6, icon: 'ability_warrior_charge' },
+    { name: 'Tronar', nameEn: 'Thunder Clap', level: 6, icon: 'spell_nature_thunderclap' },
+    { name: 'Lesión por Muslo', nameEn: 'Hamstring', level: 8, icon: 'ability_shockwave' },
+    { name: 'Furia sangrienta', nameEn: 'Bloodrage', level: 10, icon: 'ability_racial_bloodrage' },
+    { name: 'Actitud defensiva', nameEn: 'Defensive Stance', level: 10, icon: 'ability_warrior_defensivestance' },
+    { name: 'Sajar', nameEn: 'Sunder Armor', level: 10, icon: 'ability_warrior_sunder' },
+    { name: 'Provocar', nameEn: 'Taunt', level: 10, icon: 'spell_nature_reincarnation' },
+    { name: 'Abrumar', nameEn: 'Overpower', level: 12, icon: 'ability_meleedamage' },
+    { name: 'Venganza', nameEn: 'Revenge', level: 14, icon: 'ability_warrior_revenge' },
+    { name: 'Grito desmoralizador', nameEn: 'Demoralizing Shout', level: 14, icon: 'ability_warrior_warcry' },
+    { name: 'Maestría Táctica', nameEn: 'Tactical Mastery', level: 14, icon: 'spell_nature_enchantarmor' },
+    { name: 'Bloqueo con escudo', nameEn: 'Shield Block', level: 16, icon: 'ability_defend' },
+    { name: 'Hendedura', nameEn: 'Cleave', level: 20, icon: 'ability_warrior_cleave' },
+    { name: 'Golpe Potenciador', nameEn: 'Slam', level: 20, icon: 'ability_warrior_decisivestrike' },
+    { name: 'Golpe de Victoria', nameEn: 'Victory Rush', level: 20, icon: 'ability_warrior_devastate' },
+    { name: 'Represalias', nameEn: 'Retaliation', level: 20, icon: 'ability_warrior_challange' },
+    { name: 'Grito Intimidador', nameEn: 'Intimidating Shout', level: 22, icon: 'ability_golemthunderclap' },
+    { name: 'Ejecutar', nameEn: 'Execute', level: 24, icon: 'inv_sword_48' },
+    { name: 'Actitud rabiosa', nameEn: 'Berserker Stance', level: 30, icon: 'ability_racial_avatar' },
+    { name: 'Rabia Berserker', nameEn: 'Berserker Rage', level: 30, icon: 'spell_nature_ancestralguardian' },
+    { name: 'Interceptar', nameEn: 'Intercept', level: 30, icon: 'ability_rogue_sprint' },
     { name: 'Torbellino', nameEn: 'Whirlwind', level: 36, icon: 'ability_whirlwind' },
     { name: 'Golpe Mortal', nameEn: 'Mortal Strike', level: 40, icon: 'ability_warrior_savageblow' },
-    { name: 'Ejecutar', nameEn: 'Execute', level: 24, icon: 'inv_sword_48' },
-    { name: 'Provocar', nameEn: 'Taunt', level: 10, icon: 'spell_nature_reincarnation' },
-    { name: 'Escudo en Bloque', nameEn: 'Shield Block', level: 16, icon: 'ability_defend' },
-    { name: 'Muro de Escudo', nameEn: 'Shield Wall', level: 28, icon: 'ability_warrior_shieldwall' },
-    { name: 'Represalias', nameEn: 'Retaliation', level: 20, icon: 'ability_warrior_challange' },
-    { name: 'Grito de Intimidación', nameEn: 'Intimidating Shout', level: 22, icon: 'ability_groan' },
-    { name: 'Interceptar', nameEn: 'Intercept', level: 30, icon: 'ability_warrior_victoryrush' },
-    { name: 'Masa Crítica', nameEn: 'Cleave', level: 20, icon: 'ability_warrior_cleave' },
-    { name: 'Desgarrar Armadura', nameEn: 'Sunder Armor', level: 10, icon: 'ability_warrior_sunderarmor' },
-    { name: 'Romper Armadura', nameEn: 'Sunder Armor', level: 10, icon: 'ability_warrior_sunderarmor' },
+    { name: 'Escudo de pared', nameEn: 'Shield Wall', level: 28, icon: 'ability_warrior_shieldwall' },
     { name: 'Golpe de Escudo', nameEn: 'Shield Slam', level: 40, icon: 'inv_shield_05' },
-    { name: 'Venganza', nameEn: 'Revenge', level: 14, icon: 'ability_warrior_revenge' },
-    { name: 'Bloquear Escudo', nameEn: 'Shield Block', level: 16, icon: 'ability_defend' },
-    { name: 'Rabia', nameEn: 'Berserker Rage', level: 32, icon: 'spell_nature_ancestralguardian' },
-    { name: 'Sed de Sangre', nameEn: 'Bloodthirst', level: 40, icon: 'spell_nature_bloodlust' }
+    { name: 'Sed de sangre', nameEn: 'Bloodthirst', level: 40, icon: 'spell_nature_bloodlust' },
+    { name: 'Temeridad', nameEn: 'Recklessness', level: 50, icon: 'ability_criticalstrike' }
   ],
   paladin: [
-    { name: 'Luz Sagrada', nameEn: 'Holy Light', level: 1, icon: 'spell_holy_holybolt' },
-    { name: 'Fuego Sagrado', nameEn: 'Holy Fire', level: 20, icon: 'spell_holy_searinglight' },
-    { name: 'Consagración', nameEn: 'Consecration', level: 20, icon: 'spell_holy_innerfire' },
-    { name: 'Sello del Poder', nameEn: 'Seal of Power', level: 22, icon: 'spell_holy_sealofmight' },
-    { name: 'Sello de la Luz', nameEn: 'Seal of Light', level: 30, icon: 'spell_holy_healingaura' },
-    { name: 'Juicio', nameEn: 'Judgement', level: 4, icon: 'spell_holy_judgement' },
-    { name: 'Bendición de Poder', nameEn: 'Blessing of Might', level: 4, icon: 'spell_holy_greaterblessingofkings' },
-    { name: 'Bendición de Sabiduría', nameEn: 'Blessing of Wisdom', level: 14, icon: 'spell_holy_sealofwisdom' },
-    { name: 'Escudo Divino', nameEn: 'Divine Shield', level: 34, icon: 'spell_holy_divineshield' },
-    { name: 'Protección Divina', nameEn: 'Divine Protection', level: 6, icon: 'spell_holy_restoration' },
-    { name: 'Sanación', nameEn: 'Flash of Light', level: 20, icon: 'spell_holy_flashheal' },
-    { name: 'Exorcismo', nameEn: 'Exorcism', level: 20, icon: 'spell_holy_excorcism_02' },
-    { name: 'Reprensión', nameEn: 'Hammer of Wrath', level: 44, icon: 'ability_thunderclap' },
-    { name: 'Golpe de Cruzado', nameEn: 'Crusader Strike', level: 50, icon: 'spell_holy_crusaderstrike' },
-    { name: 'Aura de Devoción', nameEn: 'Devotion Aura', level: 1, icon: 'spell_holy_devotionaura' },
-    { name: 'Aura de Retribución', nameEn: 'Retribution Aura', level: 16, icon: 'spell_holy_auraoflight' },
-    { name: 'Imposición de Manos', nameEn: 'Lay on Hands', level: 10, icon: 'spell_holy_layonhands' },
+    { name: 'Luz sagrada', nameEn: 'Holy Light', level: 1, icon: 'spell_holy_holybolt' },
+    { name: 'Sello de rectitud', nameEn: 'Seal of Righteousness', level: 1, icon: 'ability_thunderbolt' },
+    { name: 'Sentencia', nameEn: 'Judgement', level: 4, icon: 'spell_holy_righteousfury' },
+    { name: 'Bendición de poder', nameEn: 'Blessing of Might', level: 4, icon: 'spell_holy_fistofjustice' },
+    { name: 'Protección divina', nameEn: 'Divine Protection', level: 6, icon: 'spell_holy_restoration' },
+    { name: 'Martillo de justicia', nameEn: 'Hammer of Justice', level: 8, icon: 'spell_holy_sealofmight' },
+    { name: 'Purificar', nameEn: 'Purify', level: 8, icon: 'spell_holy_purify' },
     { name: 'Bendición de Protección', nameEn: 'Blessing of Protection', level: 10, icon: 'spell_holy_sealofprotection' },
-    { name: 'Bendición de Libertad', nameEn: 'Blessing of Freedom', level: 18, icon: 'spell_holy_sealofvalor' }
+    { name: 'Imposición de Manos', nameEn: 'Lay on Hands', level: 10, icon: 'spell_holy_layonhands' },
+    { name: 'Furia Justa', nameEn: 'Righteous Fury', level: 10, icon: 'spell_holy_sealoffury' },
+    { name: 'Sello de Furia', nameEn: 'Seal of Fury', level: 10, icon: 'spell_holy_retributionaura' },
+    { name: 'Bendición de Libertad', nameEn: 'Blessing of Freedom', level: 18, icon: 'spell_holy_sealofvalor' },
+    { name: 'Exorcismo', nameEn: 'Exorcism', level: 20, icon: 'spell_holy_excorcism_02' },
+    { name: 'Destello de Luz', nameEn: 'Flash of Light', level: 20, icon: 'spell_holy_flashheal' },
+    { name: "Templar's Bulwark", nameEn: "Templar's Bulwark", level: 20, icon: 'spell_holy_shieldwall' },
+    { name: 'Consagración', nameEn: 'Consecration', level: 30, icon: 'spell_holy_innerfire' },
+    { name: 'Golpe Sagrado', nameEn: 'Holy Shock', level: 30, icon: 'spell_holy_searinglight' },
+    { name: 'Escudo Divino', nameEn: 'Divine Shield', level: 34, icon: 'spell_holy_divineintervention' },
+    { name: 'Martillo de la Rectitud', nameEn: 'Hammer of the Righteous', level: 40, icon: 'ability_paladin_hammeroftherighteous' },
+    { name: 'Martillo de la Ira', nameEn: 'Hammer of Wrath', level: 44, icon: 'ability_thunderclap' },
+    { name: 'Ira Sagrada', nameEn: 'Holy Wrath', level: 50, icon: 'spell_holy_excorcism' }
   ],
   hunter: [
-    { name: 'Disparo Arcano', nameEn: 'Arcane Shot', level: 6, icon: 'spell_arcane_arcaneshot' },
-    { name: 'Disparo Serpiente', nameEn: 'Serpent Sting', level: 4, icon: 'ability_hunter_quickshot' },
-    { name: 'Marca del Cazador', nameEn: "Hunter's Mark", level: 1, icon: 'ability_hunter_snipershot' },
-    { name: 'Flecha de Fuego', nameEn: 'Fire Shot', level: 20, icon: 'spell_fire_firearrow' },
-    { name: 'Disparo Múltiple', nameEn: 'Multi-Shot', level: 18, icon: 'ability_upgrademoonglaive' },
-    { name: 'Picadura de Escorpión', nameEn: 'Scorpid Sting', level: 22, icon: 'ability_hunter_criticalshot' },
-    { name: 'Disparo de Puntería', nameEn: 'Aimed Shot', level: 20, icon: 'inv_spear_07' },
-    { name: 'Trampa Helada', nameEn: 'Frost Trap', level: 28, icon: 'spell_frost_freezingbreath' },
+    { name: 'Disparo Automático', nameEn: 'Auto Shot', level: 1, icon: 'ability_whirlwind' },
+    { name: 'Golpe del Raptor', nameEn: 'Raptor Strike', level: 1, icon: 'ability_meleedamage' },
+    { name: 'Aspecto del mono', nameEn: 'Aspect of the Monkey', level: 1, icon: 'ability_hunter_quickshot' },
+    { name: 'Picadura de serpiente', nameEn: 'Serpent Sting', level: 4, icon: 'ability_hunter_quickshot' },
+    { name: 'Disparo arcano', nameEn: 'Arcane Shot', level: 6, icon: 'ability_impalingbolt' },
+    { name: 'Disparo de cazador', nameEn: "Hunter's Mark", level: 6, icon: 'ability_hunter_snipershot' },
+    { name: 'Disparo de conmoción', nameEn: 'Concussive Shot', level: 8, icon: 'spell_frost_stun' },
+    { name: 'Aspecto del halcón', nameEn: 'Aspect of the Hawk', level: 10, icon: 'spell_nature_ravenform' },
+    { name: 'Domesticar bestia', nameEn: 'Tame Beast', level: 10, icon: 'ability_hunter_beasttraining' },
+    { name: 'Disparo Distracción', nameEn: 'Distracting Shot', level: 12, icon: 'spell_arcane_blink' },
+    { name: 'Cortalargata', nameEn: 'Wing Clip', level: 12, icon: 'ability_rogue_trip' },
+    { name: 'Disparo múltiple', nameEn: 'Multi-Shot', level: 18, icon: 'ability_upgrademoonglaive' },
+    { name: 'Trampa de inmolación', nameEn: 'Immolation Trap', level: 16, icon: 'spell_fire_flameshock' },
+    { name: 'Aspecto de la chita', nameEn: 'Aspect of the Cheetah', level: 20, icon: 'ability_mount_jungletiger' },
+    { name: 'Disparo de puntería', nameEn: 'Aimed Shot', level: 20, icon: 'inv_spear_07' },
+    { name: 'Trampa congelante', nameEn: 'Freezing Trap', level: 20, icon: 'spell_frost_freezingbreath' },
+    { name: 'Desenganchar', nameEn: 'Disengage', level: 20, icon: 'ability_rogue_feint' },
+    { name: 'Fingir muerte', nameEn: 'Feign Death', level: 30, icon: 'ability_rogue_feigndeath' },
+    { name: 'Tiro Rápido', nameEn: 'Rapid Fire', level: 26, icon: 'ability_hunter_runningshot' },
     { name: 'Trampa Explosiva', nameEn: 'Explosive Trap', level: 34, icon: 'spell_fire_selfdestruct' },
-    { name: 'Trampa de Fuego', nameEn: 'Immolation Trap', level: 16, icon: 'spell_fire_immolation' },
-    { name: 'Aspecto del Halcón', nameEn: 'Aspect of the Hawk', level: 4, icon: 'spell_nature_ravenform' },
-    { name: 'Aspecto del Guepardo', nameEn: 'Aspect of the Cheetah', level: 20, icon: 'ability_mount_jungletiger' },
-    { name: 'Aspecto del Mono', nameEn: 'Aspect of the Monkey', level: 14, icon: 'ability_hunter_aspectofthemonkey' },
-    { name: 'Aspecto de la Bestia', nameEn: 'Aspect of the Beast', level: 30, icon: 'ability_mount_pinktiger' },
-    { name: 'Fingir Muerte', nameEn: 'Feign Death', level: 30, icon: 'ability_rogue_feigndeath' },
-    { name: 'Ahuyentar', nameEn: 'Scare Beast', level: 14, icon: 'ability_druid_cower' },
-    { name: 'Congelar Flecha', nameEn: 'Freezing Arrow', level: 40, icon: 'spell_frost_chainsofice' },
-    { name: 'Disparo de Ráfaga', nameEn: 'Burst Shot', level: 40, icon: 'ability_hunter_rapidkilling' }
+    { name: 'Disparo de dispersión', nameEn: 'Scatter Shot', level: 40, icon: 'ability_hunter_scattershot' },
+    { name: 'Disparo de Francotirador', nameEn: 'Sniper Shot', level: 40, icon: 'hunter_pvp_snipershot' },
+    { name: 'Descarga de Trueno', nameEn: 'Volley', level: 40, icon: 'ability_marksmanship' },
+    { name: 'Cólera bestial', nameEn: 'Bestial Wrath', level: 60, icon: 'ability_hunter_bestialwrath' }
   ],
   rogue: [
-    { name: 'Puñalada', nameEn: 'Sinister Strike', level: 1, icon: 'spell_shadow_ritualofsacrifice' },
     { name: 'Eviscerar', nameEn: 'Eviscerate', level: 1, icon: 'ability_rogue_eviscerate' },
+    { name: 'Golpe siniestro', nameEn: 'Sinister Strike', level: 1, icon: 'spell_shadow_ritualofsacrifice' },
+    { name: 'Sigilo', nameEn: 'Stealth', level: 1, icon: 'ability_stealth' },
+    { name: 'Daga emboscada', nameEn: 'Backstab', level: 4, icon: 'ability_backstab' },
     { name: 'Golpe Bajo', nameEn: 'Cheap Shot', level: 4, icon: 'ability_cheapshot' },
-    { name: 'Desgarrar', nameEn: 'Rupture', level: 10, icon: 'ability_rogue_rupture' },
-    { name: 'Golpe en la Espalda', nameEn: 'Backstab', level: 4, icon: 'ability_backstab' },
-    { name: 'Amago', nameEn: 'Feint', level: 6, icon: 'ability_rogue_feint' },
-    { name: 'Evocación', nameEn: 'Evasion', level: 8, icon: 'spell_shadow_shadowward' },
+    { name: 'Gubia', nameEn: 'Gouge', level: 6, icon: 'ability_gouge' },
+    { name: 'Evasión', nameEn: 'Evasion', level: 8, icon: 'spell_shadow_shadowward' },
     { name: 'Sprint', nameEn: 'Sprint', level: 10, icon: 'ability_rogue_sprint' },
     { name: 'Kick', nameEn: 'Kick', level: 12, icon: 'ability_kick' },
-    { name: 'Veneno de Heridas', nameEn: 'Wound Poison', level: 14, icon: 'inv_misc_herb_16' },
-    { name: 'Desarmar', nameEn: 'Disarm Trap', level: 16, icon: 'spell_shadow_teleport' },
-    { name: 'Sangrado', nameEn: 'Gouge', level: 6, icon: 'ability_gouge' },
-    { name: 'Vanish', nameEn: 'Vanish', level: 22, icon: 'ability_vanish' },
-    { name: 'Ceguera', nameEn: 'Blind', level: 24, icon: 'spell_shadow_mindsteal' },
-    { name: 'Veneno de Mente', nameEn: 'Mind-numbing Poison', level: 24, icon: 'spell_nature_nullifydisease' },
-    { name: 'Abrumar', nameEn: 'Kidney Shot', level: 26, icon: 'ability_rogue_kidneyshot' },
-    { name: 'Veneno Crippling', nameEn: 'Crippling Poison', level: 20, icon: 'ability_poisonsting' },
-    { name: 'Cold Blood', nameEn: 'Cold Blood', level: 30, icon: 'spell_ice_lament' },
+    { name: 'Desgarrar', nameEn: 'Rupture', level: 20, icon: 'ability_rogue_rupture' },
+    { name: 'Desaparición', nameEn: 'Vanish', level: 22, icon: 'ability_vanish' },
+    { name: 'Estocada', nameEn: 'Shank', level: 24, icon: 'ability_theblackarrow' },
+    { name: 'Abrumar', nameEn: 'Kidney Shot', level: 30, icon: 'ability_rogue_kidneyshot' },
     { name: 'Preparación', nameEn: 'Preparation', level: 30, icon: 'spell_shadow_antishadow' },
-    { name: 'Adrenaline Rush', nameEn: 'Adrenaline Rush', level: 40, icon: 'spell_shadow_shadowworddominate' }
+    { name: 'Ceguera', nameEn: 'Blind', level: 34, icon: 'spell_shadow_mindsteal' },
+    { name: 'Furia Adrenalínica', nameEn: 'Adrenaline Rush', level: 40, icon: 'spell_shadow_shadowworddominate' },
+    { name: 'Marca de la Muerte', nameEn: 'Death Mark', level: 40, icon: 'ability_creature_cursed_02' },
+    { name: 'Mutilar', nameEn: 'Mutilate', level: 40, icon: 'ability_rogue_deadlybrew' }
   ],
   priest: [
-    { name: 'Palabra de Poder: Escudo', nameEn: 'Power Word: Shield', level: 6, icon: 'spell_holy_powerwordshield' },
-    { name: 'Renovar', nameEn: 'Renew', level: 8, icon: 'spell_holy_renew' },
     { name: 'Curación Menor', nameEn: 'Lesser Heal', level: 1, icon: 'spell_holy_lesserheal' },
-    { name: 'Curación', nameEn: 'Heal', level: 16, icon: 'spell_holy_heal' },
-    { name: 'Rezo de Curación', nameEn: 'Prayer of Healing', level: 30, icon: 'spell_holy_prayerofhealing02' },
-    { name: 'Palabra Sagrada: Castigo', nameEn: 'Holy Word: Chastise', level: 1, icon: 'spell_holy_chastise' },
     { name: 'Castigo', nameEn: 'Smite', level: 1, icon: 'spell_holy_holysmite' },
+    { name: 'Palabra de poder: entereza', nameEn: 'Power Word: Fortitude', level: 1, icon: 'spell_holy_wordfortitude' },
     { name: 'Palabra de las Sombras: Dolor', nameEn: 'Shadow Word: Pain', level: 4, icon: 'spell_shadow_shadowwordpain' },
-    { name: 'Explosión Mental', nameEn: 'Mind Blast', level: 4, icon: 'spell_shadow_unholyfrenzy' },
-    { name: 'Control Mental', nameEn: 'Mind Control', level: 30, icon: 'spell_shadow_shadowworddominate' },
-    { name: 'Disipar Magia', nameEn: 'Dispel Magic', level: 20, icon: 'spell_holy_dispelmagic' },
-    { name: 'Purificar', nameEn: 'Purify', level: 20, icon: 'spell_holy_purify' },
-    { name: 'Miedo', nameEn: 'Psychic Scream', level: 14, icon: 'spell_shadow_psychicscream' },
+    { name: 'Palabra de poder: escudo', nameEn: 'Power Word: Shield', level: 6, icon: 'spell_holy_powerwordshield' },
+    { name: 'Renovar', nameEn: 'Renew', level: 8, icon: 'spell_holy_renew' },
+    { name: 'Desvanecer', nameEn: 'Fade', level: 8, icon: 'spell_magic_lesserinvisibilty' },
+    { name: 'Explosión mental', nameEn: 'Mind Blast', level: 10, icon: 'spell_shadow_unholyfrenzy' },
+    { name: 'Resurrección', nameEn: 'Resurrection', level: 10, icon: 'spell_holy_resurrection' },
+    { name: 'Fuego interno', nameEn: 'Inner Fire', level: 12, icon: 'spell_holy_innerfire' },
+    { name: 'Alarido psíquico', nameEn: 'Psychic Scream', level: 14, icon: 'spell_shadow_psychicscream' },
+    { name: 'Sanar', nameEn: 'Heal', level: 16, icon: 'spell_holy_heal' },
+    { name: 'Disipar magia', nameEn: 'Dispel Magic', level: 18, icon: 'spell_holy_dispelmagic' },
+    { name: 'Tortura mental', nameEn: 'Mind Flay', level: 20, icon: 'spell_shadow_siphonmana' },
     { name: 'Fuego Sagrado', nameEn: 'Holy Fire', level: 20, icon: 'spell_holy_searinglight' },
-    { name: 'Forma de las Sombras', nameEn: 'Shadowform', level: 40, icon: 'spell_shadow_shadowform' },
-    { name: 'Palabra de Poder: Fortaleza', nameEn: 'Power Word: Fortitude', level: 1, icon: 'spell_holy_wordfortitude' },
-    { name: 'Palabra de Poder: Entereza', nameEn: 'Power Word: Fortitude', level: 1, icon: 'spell_holy_wordfortitude' },
-    { name: 'Rezo de Curación', nameEn: 'Prayer of Healing', level: 30, icon: 'spell_holy_prayerofhealing' },
+    { name: 'Destello de luz sagrada', nameEn: 'Flash Heal', level: 20, icon: 'spell_holy_flashheal' },
+    { name: 'Penitencia', nameEn: 'Penance', level: 30, icon: 'spell_holy_penance' },
+    { name: 'Control Mental', nameEn: 'Mind Control', level: 30, icon: 'spell_shadow_shadowworddominate' },
+    { name: 'Rezo de sanación', nameEn: 'Prayer of Healing', level: 30, icon: 'spell_holy_prayerofhealing02' },
+    { name: 'Oración de Sanación', nameEn: 'Prayer of Mending', level: 40, icon: 'spell_holy_prayerofmendingtga' },
     { name: 'Nova Sagrada', nameEn: 'Holy Nova', level: 40, icon: 'spell_holy_holynova' },
-    { name: 'Aliento de la Naturaleza', nameEn: 'Inner Fire', level: 12, icon: 'spell_holy_innerfire' }
+    { name: 'Forma de la sombra', nameEn: 'Shadowform', level: 40, icon: 'spell_shadow_shadowform' },
+    { name: 'Gran Sanación', nameEn: 'Greater Heal', level: 40, icon: 'spell_holy_greaterheal' }
   ],
   shaman: [
-    { name: 'Relámpago', nameEn: 'Lightning Bolt', level: 1, icon: 'spell_nature_lightningbolt' },
-    { name: 'Choque de Tierra', nameEn: 'Earth Shock', level: 4, icon: 'spell_nature_earthshock' },
-    { name: 'Choque de Fuego', nameEn: 'Flame Shock', level: 10, icon: 'spell_fire_flameshock' },
-    { name: 'Choque de Escarcha', nameEn: 'Frost Shock', level: 20, icon: 'spell_frost_frostshock' },
-    { name: 'Rayo', nameEn: 'Chain Lightning', level: 32, icon: 'spell_nature_chainlightning' },
-    { name: 'Curación', nameEn: 'Healing Wave', level: 1, icon: 'spell_nature_healingwavegreater' },
-    { name: 'Curación Menor', nameEn: 'Lesser Healing Wave', level: 20, icon: 'spell_nature_healingwavelesser' },
+    { name: 'Descarga de relámpagos', nameEn: 'Lightning Bolt', level: 1, icon: 'spell_nature_lightning' },
+    { name: 'Ola de sanación', nameEn: 'Healing Wave', level: 1, icon: 'spell_nature_magicimmunity' },
+    { name: 'Choque de tierra', nameEn: 'Earth Shock', level: 4, icon: 'spell_nature_earthshock' },
+    { name: 'Tótem de piel de piedra', nameEn: 'Stoneskin Totem', level: 4, icon: 'spell_nature_stoneskintotem' },
+    { name: 'Tótem de atadura de tierra', nameEn: 'Earthbind Totem', level: 6, icon: 'spell_nature_strengthofearthtotem02' },
     { name: 'Escudo de Relámpago', nameEn: 'Lightning Shield', level: 8, icon: 'spell_nature_lightningshield' },
-    { name: 'Arma de Fuego', nameEn: 'Flametongue Weapon', level: 10, icon: 'spell_fire_flametongue' },
-    { name: 'Arma de Escarcha', nameEn: 'Frostbrand Weapon', level: 20, icon: 'spell_frost_frostbrand' },
-    { name: 'Arma de Viento', nameEn: 'Windfury Weapon', level: 30, icon: 'spell_nature_cyclone' },
-    { name: 'Tótem de Fuerza de Tierra', nameEn: 'Strength of Earth Totem', level: 10, icon: 'spell_nature_earthbindtotem' },
-    { name: 'Tótem de Piel de Piedra', nameEn: 'Stoneskin Totem', level: 4, icon: 'spell_nature_stoneskintotem' },
-    { name: 'Tótem de Sanación', nameEn: 'Healing Stream Totem', level: 20, icon: 'inv_spear_04' },
-    { name: 'Tótem de Maná', nameEn: 'Mana Spring Totem', level: 26, icon: 'spell_nature_manaregentotem' },
-    { name: 'Tótem de Cólera', nameEn: 'Searing Totem', level: 10, icon: 'spell_fire_searingtotem' },
-    { name: 'Tótem de Magma', nameEn: 'Magma Totem', level: 26, icon: 'spell_fire_selfdestruct' },
-    { name: 'Tótem de Temblor', nameEn: 'Tremor Totem', level: 18, icon: 'spell_nature_tremortotem' },
-    { name: 'Tótem de Limpieza', nameEn: 'Cleansing Totem', level: 38, icon: 'spell_nature_diseasecleansingtotem' },
-    { name: 'Tótem de Resistencia al Fuego', nameEn: 'Fire Resistance Totem', level: 24, icon: 'spell_fire_resistfire' },
-    { name: 'Tótem de Resistencia a la Escarcha', nameEn: 'Frost Resistance Totem', level: 26, icon: 'spell_frost_resistfrost' },
-    { name: 'Tótem de Gracia del Viento', nameEn: 'Grace of Air Totem', level: 42, icon: 'spell_nature_invisibilitytotem' },
-    { name: 'Tótem de Cólera de Viento', nameEn: 'Windfury Totem', level: 30, icon: 'spell_nature_windfury' },
     { name: 'Tótem de Garra de Piedra', nameEn: 'Stoneclaw Totem', level: 8, icon: 'spell_nature_stoneclawtotem' },
-    { name: 'Tótem de Fuerza de Voluntad', nameEn: 'Grounding Totem', level: 30, icon: 'spell_nature_groundingtotem' },
-    { name: 'Tótem de Marea de Maná', nameEn: 'Mana Tide Totem', level: 40, icon: 'spell_frost_summonwaterelemental' },
-    { name: 'Tótem de Cólera de Fuego', nameEn: 'Wrath of Air Totem', level: 44, icon: 'spell_nature_slowingtotem' },
-    { name: 'Tótem de Furia de Sangre', nameEn: 'Bloodlust', level: 50, icon: 'spell_nature_bloodlust' },
-    { name: 'Tótem de Sanación en Cadena', nameEn: 'Chain Heal', level: 40, icon: 'spell_nature_healingwavegreater' },
-    { name: 'Forma de Lobo Espectral', nameEn: 'Ghost Wolf', level: 20, icon: 'spell_nature_spiritwolf' }
+    { name: 'Choque de llamas', nameEn: 'Flame Shock', level: 10, icon: 'spell_fire_flameshock' },
+    { name: 'Tótem Lengua de Fuego', nameEn: 'Searing Totem', level: 10, icon: 'spell_fire_searingtotem' },
+    { name: 'Tótem de Fuerza de Tierra', nameEn: 'Strength of Earth Totem', level: 10, icon: 'spell_nature_earthbindtotem' },
+    { name: 'Llamar a los Elementos', nameEn: 'Call of the Elements', level: 20, icon: 'spell_shaman_dropall_01' },
+    { name: 'Choque de escarcha', nameEn: 'Frost Shock', level: 20, icon: 'spell_frost_frostshock' },
+    { name: 'Lobo fantasma', nameEn: 'Ghost Wolf', level: 20, icon: 'spell_nature_spiritwolf' },
+    { name: 'Ola de Sanación Menor', nameEn: 'Lesser Healing Wave', level: 20, icon: 'spell_nature_healingwavelesser' },
+    { name: 'Tótem de Sanación', nameEn: 'Healing Stream Totem', level: 20, icon: 'inv_spear_04' },
+    { name: 'Recuerdo de Tóten', nameEn: 'Totemic Recall', level: 20, icon: 'spell_shaman_totemrecall' },
+    { name: 'Escudo de Agua', nameEn: 'Water Shield', level: 20, icon: 'ability_shaman_watershield' },
+    { name: 'Tormenta de relámpagos', nameEn: 'Chain Lightning', level: 32, icon: 'spell_nature_chainlightning' },
+    { name: 'Llamar a los Antepasados', nameEn: 'Call of the Ancestors', level: 30, icon: 'spell_shaman_dropall_02' },
+    { name: 'Tótem Marea de Maná', nameEn: 'Mana Tide Totem', level: 40, icon: 'spell_frost_summonwaterelemental' },
+    { name: 'Sanación en Cadena', nameEn: 'Chain Heal', level: 40, icon: 'spell_nature_healingwavegreater' },
+    { name: 'Marea de Sangre', nameEn: 'Bloodlust', level: 50, icon: 'spell_nature_bloodlust' },
+    { name: 'Ráfaga de Fuego', nameEn: 'Fire Nova', level: 12, icon: 'spell_fire_sealoffire' },
+    { name: 'Purga', nameEn: 'Purge', level: 12, icon: 'spell_nature_purge' }
   ],
   mage: [
-    { name: 'Bola de Fuego', nameEn: 'Fireball', level: 1, icon: 'spell_fire_fireball' },
-    { name: 'Escarcha', nameEn: 'Frostbolt', level: 4, icon: 'spell_frost_frostbolt02' },
+    { name: 'Bola de fuego', nameEn: 'Fireball', level: 1, icon: 'spell_fire_flamebolt' },
+    { name: 'Descarga de escarcha', nameEn: 'Frostbolt', level: 4, icon: 'spell_frost_frostbolt02' },
     { name: 'Proyectil Arcano', nameEn: 'Arcane Missiles', level: 8, icon: 'spell_nature_starfall' },
-    { name: 'Explosión Arcana', nameEn: 'Arcane Explosion', level: 14, icon: 'spell_nature_wispsplode' },
-    { name: 'Nova de Escarcha', nameEn: 'Frost Nova', level: 10, icon: 'spell_frost_frostnova' },
-    { name: 'Cono de Frío', nameEn: 'Cone of Cold', level: 26, icon: 'spell_frost_glacier' },
-    { name: 'Blizzard', nameEn: 'Blizzard', level: 20, icon: 'spell_frost_icestorm' },
-    { name: 'Lluvia de Fuego', nameEn: 'Rain of Fire', level: 20, icon: 'spell_shadow_rainoffire' },
-    { name: 'Piroexplosión', nameEn: 'Pyroblast', level: 20, icon: 'spell_fire_fireball02' },
-    { name: 'Escudo de Hielo', nameEn: 'Ice Barrier', level: 40, icon: 'spell_ice_lament' },
-    { name: 'Bloque de Hielo', nameEn: 'Ice Block', level: 30, icon: 'spell_frost_frost' },
+    { name: 'Transformación', nameEn: 'Polymorph', level: 8, icon: 'spell_nature_polymorph' },
+    { name: 'Nova de escarcha', nameEn: 'Frost Nova', level: 10, icon: 'spell_frost_frostnova' },
+    { name: 'Deflagración arcana', nameEn: 'Arcane Explosion', level: 14, icon: 'spell_nature_wispsplode' },
     { name: 'Intelecto Arcano', nameEn: 'Arcane Intellect', level: 1, icon: 'spell_holy_magicalsentry' },
-    { name: 'Armadura de Escarcha', nameEn: 'Frost Armor', level: 1, icon: 'spell_frost_frostarmor02' },
-    { name: 'Armadura de Magma', nameEn: 'Molten Armor', level: 30, icon: 'spell_fire_firearmor' },
-    { name: 'Armadura de Hielo', nameEn: 'Ice Armor', level: 30, icon: 'spell_frost_frostarmor' },
-    { name: 'Polimorfia', nameEn: 'Polymorph', level: 8, icon: 'spell_nature_polymorph' },
+    { name: 'Traslación', nameEn: 'Blink', level: 20, icon: 'spell_arcane_blink' },
+    { name: 'Blizzard', nameEn: 'Blizzard', level: 20, icon: 'spell_frost_icestorm' },
     { name: 'Contrahechizo', nameEn: 'Counterspell', level: 24, icon: 'spell_frost_iceshock' },
-    { name: 'Remover Maldición', nameEn: 'Remove Curse', level: 18, icon: 'spell_holy_removecurse' },
-    { name: 'Teletransporte: Ventormenta', nameEn: 'Teleport: Stormwind', level: 20, icon: 'spell_arcane_teleportstormwind' },
+    { name: 'Arcane Blast', nameEn: 'Arcane Blast', level: 20, icon: 'spell_arcane_blast' },
+    { name: 'Ice Lance', nameEn: 'Ice Lance', level: 20, icon: 'spell_frost_frostblast' },
+    { name: 'Bloque de hielo', nameEn: 'Ice Block', level: 25, icon: 'spell_frost_frost' },
+    { name: 'Cono de frío', nameEn: 'Cone of Cold', level: 26, icon: 'spell_frost_glacier' },
+    { name: 'Frostfire Bolt', nameEn: 'Frostfire Bolt', level: 40, icon: 'ability_mage_frostfirebolt' },
+    { name: 'Ice Barrier', nameEn: 'Ice Barrier', level: 40, icon: 'spell_ice_lament' },
+    { name: 'Teletransporte: Dalaran', nameEn: 'Teleport: Dalaran', level: 50, icon: 'spell_arcane_teleporthalloftheguardian' },
     { name: 'Portal: Ventormenta', nameEn: 'Portal: Stormwind', level: 40, icon: 'spell_arcane_portalstormwind' },
-    { name: 'Teletransporte: Forjaz', nameEn: 'Teleport: Ironforge', level: 20, icon: 'spell_arcane_teleportironforge' },
-    { name: 'Portal: Forjaz', nameEn: 'Portal: Ironforge', level: 40, icon: 'spell_arcane_portalironforge' },
-    { name: 'Teletransporte: Darnassus', nameEn: 'Teleport: Darnassus', level: 20, icon: 'spell_arcane_teleportdarnassus' },
-    { name: 'Portal: Darnassus', nameEn: 'Portal: Darnassus', level: 40, icon: 'spell_arcane_portaldarnassus' },
-    { name: 'Teletransporte: Orgrimmar', nameEn: 'Teleport: Orgrimmar', level: 20, icon: 'spell_arcane_teleportorgrimmar' },
-    { name: 'Portal: Orgrimmar', nameEn: 'Portal: Orgrimmar', level: 40, icon: 'spell_arcane_portalorgrimmar' },
-    { name: 'Teletransporte: Entrañas', nameEn: 'Teleport: Undercity', level: 20, icon: 'spell_arcane_teleportundercity' },
-    { name: 'Portal: Entrañas', nameEn: 'Portal: Undercity', level: 40, icon: 'spell_arcane_portalundercity' },
-    { name: 'Teletransporte: Cima del Trueno', nameEn: 'Teleport: Thunder Bluff', level: 20, icon: 'spell_arcane_teleportthunderbluff' },
-    { name: 'Portal: Cima del Trueno', nameEn: 'Portal: Thunder Bluff', level: 40, icon: 'spell_arcane_portalthunderbluff' },
-    { name: 'Teletransporte: Marjal Revolcafango', nameEn: 'Teleport: Stonard', level: 20, icon: 'spell_arcane_teleportstonard' },
-    { name: 'Teletransporte: Theramore', nameEn: 'Teleport: Theramore', level: 20, icon: 'spell_arcane_teleporttheramore' }
+    { name: 'Portal: Orgrimmar', nameEn: 'Portal: Orgrimmar', level: 40, icon: 'spell_arcane_portalorgrimmar' }
   ],
   warlock: [
-    { name: 'Descarga de Sombras', nameEn: 'Shadow Bolt', level: 1, icon: 'spell_shadow_shadowbolt' },
-    { name: 'Corrupción', nameEn: 'Corruption', level: 4, icon: 'spell_shadow_abominationexplosion' },
-    { name: 'Maldición de Debilidad', nameEn: 'Curse of Weakness', level: 4, icon: 'spell_shadow_curseofsargeras' },
-    { name: 'Maldición de Agonía', nameEn: 'Curse of Agony', level: 8, icon: 'spell_shadow_curseofsargeras' },
-    { name: 'Miedo', nameEn: 'Fear', level: 8, icon: 'spell_shadow_possession' },
-    { name: 'Drenar Alma', nameEn: 'Drain Soul', level: 10, icon: 'spell_shadow_haunting' },
-    { name: 'Drenar Vida', nameEn: 'Drain Life', level: 14, icon: 'spell_shadow_lifedrain02' },
-    { name: 'Maldición de Temeridad', nameEn: 'Curse of Recklessness', level: 14, icon: 'spell_shadow_unholystrength' },
-    { name: 'Maldición de Lenguas', nameEn: 'Curse of Tongues', level: 26, icon: 'spell_shadow_curseoftounges' },
-    { name: 'Maldición de los Elementos', nameEn: 'Curse of the Elements', level: 32, icon: 'spell_shadow_chilltouch' },
-    { name: 'Maldición de las Sombras', nameEn: 'Curse of Shadow', level: 44, icon: 'spell_shadow_curseofsargeras' },
-    { name: 'Maldición de la Perdición', nameEn: 'Curse of Doom', level: 60, icon: 'spell_shadow_curseofmannoroth' },
-    { name: 'Sanguijuela de Vida', nameEn: 'Siphon Life', level: 30, icon: 'spell_shadow_requiem' },
-    { name: 'Drenar Maná', nameEn: 'Drain Mana', level: 24, icon: 'spell_shadow_siphonmana' },
-    { name: 'Aullido de Terror', nameEn: 'Howl of Terror', level: 40, icon: 'spell_shadow_deathscream' },
-    { name: 'Golpe de Muerte', nameEn: 'Death Coil', level: 42, icon: 'spell_shadow_deathcoil' },
+    { name: 'Descarga de las Sombras', nameEn: 'Shadow Bolt', level: 1, icon: 'spell_shadow_shadowbolt' },
     { name: 'Piel de Demonio', nameEn: 'Demon Skin', level: 1, icon: 'spell_shadow_ragingscream' },
-    { name: 'Armadura Demoníaca', nameEn: 'Demon Armor', level: 20, icon: 'spell_shadow_ragingscream' },
+    { name: 'Corrupción', nameEn: 'Corruption', level: 4, icon: 'spell_shadow_abominationexplosion' },
+    { name: 'Maldición de Debilidad', nameEn: 'Curse of Weakness', level: 4, icon: 'spell_shadow_curseofmannoroth' },
+    { name: 'Maldición de agonía', nameEn: 'Curse of Agony', level: 8, icon: 'spell_shadow_curseofsargeras' },
+    { name: 'Drenar Alma', nameEn: 'Drain Soul', level: 10, icon: 'spell_shadow_haunting' },
     { name: 'Crear Piedra de Salud', nameEn: 'Create Healthstone', level: 10, icon: 'inv_stone_04' },
-    { name: 'Crear Piedra de Alma', nameEn: 'Create Soulstone', level: 18, icon: 'inv_misc_orb_04' },
-    { name: 'Crear Piedra de Fuego', nameEn: 'Create Firestone', level: 28, icon: 'inv_misc_gem_bloodstone_02' },
-    { name: 'Crear Piedra de Hechizo', nameEn: 'Create Spellstone', level: 36, icon: 'inv_misc_gem_sapphire_01' },
-    { name: 'Aliento Inagotable', nameEn: 'Unending Breath', level: 16, icon: 'spell_shadow_demonbreath' },
-    { name: 'Ojo de Kilrogg', nameEn: 'Eye of Kilrogg', level: 22, icon: 'spell_shadow_evileye' },
-    { name: 'Ritual de Invocación', nameEn: 'Ritual of Summoning', level: 20, icon: 'spell_shadow_twilight' },
-    { name: 'Detectar Demonios', nameEn: 'Sense Demons', level: 24, icon: 'spell_shadow_metamorphosis' },
+    { name: 'Drenar vida', nameEn: 'Drain Life', level: 14, icon: 'spell_shadow_lifedrain02' },
+    { name: 'Maldición de Temeridad', nameEn: 'Curse of Recklessness', level: 14, icon: 'spell_shadow_unholystrength' },
+    { name: 'Crear Piedra de Alma', nameEn: 'Create Soulstone', level: 18, icon: 'spell_shadow_soulgem' },
+    { name: 'Drenar maná', nameEn: 'Drain Mana', level: 24, icon: 'spell_shadow_siphonmana' },
+    { name: 'Maldición de Lenguas', nameEn: 'Curse of Tongues', level: 26, icon: 'spell_shadow_curseoftounges' },
     { name: 'Desterrar', nameEn: 'Banish', level: 28, icon: 'spell_shadow_cripple' },
-    { name: 'Esclavizar Demonio', nameEn: 'Enslave Demon', level: 30, icon: 'spell_shadow_enslavedemon' },
-    { name: 'Pacto Oscuro', nameEn: 'Dark Pact', level: 40, icon: 'spell_shadow_darkritual' },
-    { name: 'Invocar Esbirro', nameEn: 'Summon Imp', level: 1, icon: 'spell_shadow_summonimp' },
-    { name: 'Invocar Súcubo', nameEn: 'Summon Succubus', level: 20, icon: 'spell_shadow_summonsuccubus' },
-    { name: 'Invocar Abisario', nameEn: 'Summon Voidwalker', level: 10, icon: 'spell_shadow_summonvoidwalker' },
-    { name: 'Invocar Cazador de Demonios', nameEn: 'Summon Felhunter', level: 30, icon: 'spell_shadow_summonfelhunter' },
-    { name: 'Invocar Corcel Vil', nameEn: 'Summon Felsteed', level: 40, icon: 'spell_nature_swiftness' },
-    { name: 'Invocar Corcel de la Muerte', nameEn: 'Summon Dreadsteed', level: 60, icon: 'spell_nature_swiftness' }
+    { name: 'Crear Piedra de Fuego', nameEn: 'Create Firestone', level: 28, icon: 'inv_misc_gem_bloodstone_02' },
+    { name: 'Lluvia de Fuego', nameEn: 'Rain of Fire', level: 20, icon: 'spell_shadow_rainoffire' },
+    { name: 'Ritual de Invocación', nameEn: 'Ritual of Summoning', level: 20, icon: 'spell_shadow_twilight' },
+    { name: 'Conflagrar', nameEn: 'Conflagrate', level: 25, icon: 'spell_fire_fireball' },
+    { name: 'Aullido de Terror', nameEn: 'Howl of Terror', level: 40, icon: 'spell_shadow_deathscream' },
+    { name: 'Incinerar', nameEn: 'Incinerate', level: 40, icon: 'spell_fire_burnout' },
+    { name: 'Espiral de la muerte', nameEn: 'Death Coil', level: 42, icon: 'spell_shadow_deathcoil' },
+    { name: 'Maldición de la Perdición', nameEn: 'Curse of Doom', level: 60, icon: 'spell_shadow_curseofmannoroth' },
+    { name: 'Portal de Invocación', nameEn: 'Portal of Summoning', level: 60, icon: 'inv_misc_rune_10' }
   ],
   druid: [
     { name: 'Cólera', nameEn: 'Wrath', level: 1, icon: 'spell_nature_wrathv2' },
-    { name: 'Sanar', nameEn: 'Healing Touch', level: 1, icon: 'spell_nature_healingtouch' },
+    { name: 'Toque de sanación', nameEn: 'Healing Touch', level: 1, icon: 'spell_nature_healingtouch' },
     { name: 'Marca de lo Salvaje', nameEn: 'Mark of the Wild', level: 1, icon: 'spell_nature_regeneration' },
-    { name: 'Fuego Lunar', nameEn: 'Moonfire', level: 4, icon: 'spell_nature_starfall' },
+    { name: 'Fuego lunar', nameEn: 'Moonfire', level: 4, icon: 'spell_nature_starfall' },
     { name: 'Rejuvenecimiento', nameEn: 'Rejuvenation', level: 4, icon: 'spell_nature_rejuvenation' },
     { name: 'Enredar', nameEn: 'Entangling Roots', level: 8, icon: 'spell_nature_stranglevines' },
-    { name: 'Forma de Oso', nameEn: 'Bear Form', level: 10, icon: 'ability_racial_bearform' },
+    { name: 'Forma de oso', nameEn: 'Bear Form', level: 10, icon: 'ability_racial_bearform' },
+    { name: 'Rugido Desmoralizador', nameEn: 'Demoralizing Roar', level: 10, icon: 'ability_racial_bearform' },
     { name: 'Regeneración', nameEn: 'Regrowth', level: 12, icon: 'spell_nature_regenerate' },
-    { name: 'Forma de Lobo', nameEn: 'Cat Form', level: 20, icon: 'ability_druid_catform' },
-    { name: 'Zarpa', nameEn: 'Claw', level: 20, icon: 'ability_druid_rake' },
-    { name: 'Mordisco', nameEn: 'Bite', level: 20, icon: 'ability_druid_ferociousbite' },
-    { name: 'Desgarrar', nameEn: 'Rip', level: 24, icon: 'ability_creature_poison_06' },
-    { name: 'Forma de Viaje', nameEn: 'Travel Form', level: 30, icon: 'ability_druid_travelform' },
-    { name: 'Forma de Lechúcico', nameEn: 'Moonkin Form', level: 40, icon: 'spell_nature_forceofnature' },
-    { name: 'Forma de Lobo Espectral', nameEn: 'Ghost Wolf', level: 20, icon: 'spell_nature_spiritwolf' },
-    { name: 'Curación Rápida', nameEn: 'Swiftmend', level: 40, icon: 'ability_druid_swiftmend' },
-    { name: 'Naturaleza Veloz', nameEn: 'Nature\'s Swiftness', level: 30, icon: 'spell_nature_ravenform' },
+    { name: 'Revivir', nameEn: 'Revive', level: 12, icon: 'spell_nature_resistnature' },
+    { name: 'Forma de felino', nameEn: 'Cat Form', level: 20, icon: 'ability_druid_catform' },
+    { name: 'Zarpa', nameEn: 'Rake', level: 20, icon: 'ability_druid_rake' },
     { name: 'Fuego Estelar', nameEn: 'Starfire', level: 20, icon: 'spell_arcane_starfire' },
-    { name: 'Huracán', nameEn: 'Hurricane', level: 40, icon: 'spell_nature_cyclone' },
+    { name: 'Desgarrar', nameEn: 'Rip', level: 24, icon: 'ability_creature_poison_06' },
+    { name: 'Mordisco Feraz', nameEn: 'Ferocious Bite', level: 24, icon: 'ability_druid_ferociousbite' },
+    { name: 'Cargar Felino', nameEn: 'Feral Charge', level: 20, icon: 'ability_hunter_pet_bear' },
+    { name: 'Desencuentro', nameEn: 'Faerie Fire', level: 18, icon: 'spell_nature_faeriefire' },
+    { name: 'Forma de viaje', nameEn: 'Travel Form', level: 30, icon: 'ability_druid_travelform' },
     { name: 'Tranquilidad', nameEn: 'Tranquility', level: 30, icon: 'spell_nature_tranquility' },
-    { name: 'Innervar', nameEn: 'Innervate', level: 40, icon: 'spell_nature_lightning' },
-    { name: 'Eliminar Maldición', nameEn: 'Remove Curse', level: 24, icon: 'spell_holy_removecurse' },
-    { name: 'Abrasar', nameEn: 'Abolish Poison', level: 26, icon: 'spell_nature_nullifypoison_02' },
-    { name: 'Curación en Grupo', nameEn: 'Healing Touch', level: 1, icon: 'spell_nature_healingtouch' }
+    { name: "Naturaleza Veloz", nameEn: "Nature's Swiftness", level: 30, icon: 'spell_nature_ravenform' },
+    { name: 'Curación Rápida', nameEn: 'Swiftmend', level: 25, icon: 'ability_druid_swiftmend' },
+    { name: 'Lacerar', nameEn: 'Lacerate', level: 25, icon: 'ability_druid_ferociousbite' },
+    { name: 'Huracán', nameEn: 'Hurricane', level: 40, icon: 'spell_nature_cyclone' },
+    { name: 'Estimular', nameEn: 'Innervate', level: 40, icon: 'spell_nature_lightning' },
+    { name: 'Huir', nameEn: 'Prowl', level: 20, icon: 'ability_stealth' }
   ]
 };
 
-// Combinaciones raza↔clase (referencia Classic; Forever puede diferir) [VERIFICAR Forever]
-// Incluye skyborne_* como permisivo por ser contenido custom.
-const RACE_CLASSES = {
-  human: ['warrior','paladin','rogue','priest','mage','warlock'],
-  dwarf: ['warrior','paladin','hunter','rogue','priest'],
-  nightelf: ['warrior','hunter','rogue','priest','druid'],
-  gnome: ['warrior','rogue','mage','warlock'],
-  draenei: ['warrior','paladin','hunter','priest','shaman','mage'], // [VERIFICAR]
-  orc: ['warrior','hunter','rogue','shaman','warlock'],
-  undead: ['warrior','rogue','priest','mage','warlock'],
-  tauren: ['warrior','hunter','shaman','druid'],
-  troll: ['warrior','hunter','rogue','priest','shaman','mage'],
-  bloodelf: ['paladin','hunter','rogue','priest','mage','warlock'], // [VERIFICAR]
-  skyborne_alliance: ['warrior','paladin','hunter','rogue','priest','mage','warlock','druid','shaman'], // [VERIFICAR]
-  skyborne_horde: ['warrior','hunter','rogue','priest','mage','warlock','druid','shaman'] // [VERIFICAR]
+const EMBEDDED_TALENTS = {
+  warrior: { trees: [
+    { name: 'Armas', nameEn: 'Arms', talents: [
+      { name: 'Golpe Mejorado', nameEn: 'Improved Strike', maxRank: 3, desc: 'Aumenta el daño de Golpe Heroico y Rend.', benefit: '+15% daño en habilidades básicas.', tree: 'Armas', row: 1, col: 1, points: null, requires: [], icon: 'ability_rogue_heroicstrike', level: 10, spell: null },
+      { name: 'Especialización en Hachas', nameEn: 'Axe Specialization', maxRank: 5, desc: 'Aumenta la probabilidad de crítico con hachas.', benefit: '+5% crítico con hachas.', tree: 'Armas', row: 1, col: 2, points: null, requires: [], icon: 'inv_axe_01', level: 10, spell: null },
+      { name: 'Golpe Mortal', nameEn: 'Mortal Strike', maxRank: 1, desc: 'Habilidad activa que causa daño y reduce curación.', benefit: 'Desbloquea Golpe Mortal: 200% daño de arma, -50% curación en objetivo.', tree: 'Armas', row: 2, col: 1, points: 10, requires: [], icon: 'ability_warrior_savageblow', level: 20, spell: 12294 },
+      { name: 'Sed de Sangre', nameEn: 'Bloodthirst', maxRank: 1, desc: 'Habilidad activa que cura al guerrero.', benefit: 'Desbloquea Sed de Sangre: daño + curación propia.', tree: 'Armas', row: 2, col: 2, points: 10, requires: [], icon: 'spell_nature_bloodlust', level: 20, spell: 23881 }
+    ]},
+    { name: 'Furia', nameEn: 'Fury', talents: [
+      { name: 'Rabia Mejorada', nameEn: 'Improved Berserker Rage', maxRank: 3, desc: 'Aumenta la generación de ira.', benefit: '+9 ira por uso de Rabia.', tree: 'Furia', row: 1, col: 1, points: null, requires: [], icon: 'spell_nature_ancestralguardian', level: 10, spell: null },
+      { name: 'Ejecución Mejorada', nameEn: 'Improved Execute', maxRank: 2, desc: 'Reduce el costo de ira de Ejecutar.', benefit: '-5 ira en Ejecutar.', tree: 'Furia', row: 1, col: 2, points: null, requires: [], icon: 'inv_sword_48', level: 10, spell: null },
+      { name: 'Torbellino Mejorado', nameEn: 'Improved Whirlwind', maxRank: 3, desc: 'Aumenta el daño de Torbellino.', benefit: '+15% daño de Torbellino.', tree: 'Furia', row: 2, col: 1, points: 10, requires: [], icon: 'ability_whirlwind', level: 20, spell: null },
+      { name: 'Muerte Repentina', nameEn: 'Sudden Death', maxRank: 3, desc: 'Permite usar Ejecutar sin importar la vida del objetivo.', benefit: '15% probabilidad de Ejecutar gratis.', tree: 'Furia', row: 2, col: 2, points: 10, requires: [], icon: 'spell_shadow_deathcoil', level: 20, spell: null }
+    ]},
+    { name: 'Protección', nameEn: 'Protection', talents: [
+      { name: 'Resistencia', nameEn: 'Toughness', maxRank: 5, desc: 'Aumenta la armadura.', benefit: '+10% armadura.', tree: 'Protección', row: 1, col: 1, points: null, requires: [], icon: 'spell_nature_reincarnation', level: 10, spell: null },
+      { name: 'Muro de Escudo Mejorado', nameEn: 'Improved Shield Wall', maxRank: 2, desc: 'Aumenta la duración de Muro de Escudo.', benefit: '+3s duración.', tree: 'Protección', row: 1, col: 2, points: null, requires: [], icon: 'ability_warrior_shieldwall', level: 10, spell: null },
+      { name: 'Provocación Mejorada', nameEn: 'Improved Taunt', maxRank: 2, desc: 'Reduce el tiempo de reutilización de Provocar.', benefit: '-2s CD.', tree: 'Protección', row: 2, col: 1, points: 10, requires: [], icon: 'spell_nature_reincarnation', level: 20, spell: null },
+      { name: 'Escudo de la Tempestad', nameEn: 'Shield Slam', maxRank: 1, desc: 'Habilidad activa de daño y generación de amenaza.', benefit: 'Desbloquea Golpe de Escudo: alto daño + amenaza.', tree: 'Protección', row: 2, col: 2, points: 10, requires: [], icon: 'inv_shield_05', level: 20, spell: 23922 }
+    ]}
+  ]},
+  paladin: { trees: [
+    { name: 'Sagrado', nameEn: 'Holy', talents: [] },
+    { name: 'Protección', nameEn: 'Protection', talents: [] },
+    { name: 'Retribución', nameEn: 'Retribution', talents: [] }
+  ]},
+  hunter: { trees: [
+    { name: 'Dominio de Bestias', nameEn: 'Beast Mastery', talents: [] },
+    { name: 'Puntería', nameEn: 'Marksmanship', talents: [] },
+    { name: 'Supervivencia', nameEn: 'Survival', talents: [] }
+  ]},
+  rogue: { trees: [
+    { name: 'Asesinato', nameEn: 'Assassination', talents: [] },
+    { name: 'Combate', nameEn: 'Combat', talents: [] },
+    { name: 'Sutileza', nameEn: 'Subtlety', talents: [] }
+  ]},
+  priest: { trees: [
+    { name: 'Disciplina', nameEn: 'Discipline', talents: [] },
+    { name: 'Sagrado', nameEn: 'Holy', talents: [] },
+    { name: 'Sombras', nameEn: 'Shadow', talents: [] }
+  ]},
+  shaman: { trees: [
+    { name: 'Elemental', nameEn: 'Elemental', talents: [] },
+    { name: 'Mejora', nameEn: 'Enhancement', talents: [] },
+    { name: 'Restauración', nameEn: 'Restoration', talents: [] }
+  ]},
+  mage: { trees: [
+    { name: 'Arcano', nameEn: 'Arcane', talents: [] },
+    { name: 'Fuego', nameEn: 'Fire', talents: [] },
+    { name: 'Escarcha', nameEn: 'Frost', talents: [] }
+  ]},
+  warlock: { trees: [
+    { name: 'Aflicción', nameEn: 'Affliction', talents: [] },
+    { name: 'Demonología', nameEn: 'Demonology', talents: [] },
+    { name: 'Destrucción', nameEn: 'Destruction', talents: [] }
+  ]},
+  druid: { trees: [
+    { name: 'Equilibrio', nameEn: 'Balance', talents: [] },
+    { name: 'Combatiente Feral', nameEn: 'Feral Combat', talents: [] },
+    { name: 'Restauración', nameEn: 'Restoration', talents: [] }
+  ]}
 };
 
-// Opciones de macro con descripciones para tooltips/help accesible
-const MACRO_OPTIONS = [
-  { id: 'showtooltip', label: '#showtooltip', desc: 'Muestra el icono y tooltip del primer hechizo. Recomendado. Debe ir en la primera línea.', default: true },
-  { id: 'startattack', label: '/startattack', desc: 'Inicia el auto-ataque contra el objetivo. Útil para guerreros, pícaros, cazadores, etc.', default: false },
-  { id: 'petattack', label: '/petattack', desc: 'Ordena a tu mascota atacar al objetivo actual (cazador/brujo).', default: false },
-  { id: 'stopcasting', label: '/stopcasting', desc: 'Interrumpe el lanzamiento actual. Útil para interrupciones/emergencia.', default: false },
-  { id: 'cancelaura', label: '/cancelaura [nombre]', desc: 'Cancela un buff/aura específico por nombre exacto del cliente. Configura el nombre abajo.', default: false, hasInput: true },
-  { id: 'castsequence', label: '/castsequence reset=target', desc: 'Avanza la secuencia con cada pulsación (reset=target). Los modificadores no se aplican a castsequence.', default: false },
-  { id: 'mouseover', label: '[@mouseover]', desc: 'Lanza sobre el objetivo bajo el cursor. Combínalo con [help]/[harm] según el hechizo.', default: false },
-  { id: 'harm', label: '[harm]', desc: 'Solo si el objetivo es hostil (daño). Se omite automáticamente si el primer hechizo es amistoso.', default: false },
-  { id: 'help', label: '[help]', desc: 'Solo si el objetivo es amistoso (curación/buff). Se omite si el primer hechizo es hostil.', default: false },
-  { id: 'nodead', label: '[nodead]', desc: 'Solo si el objetivo está vivo.', default: false },
-  { id: 'exists', label: '[exists]', desc: 'Solo si el objetivo existe.', default: false },
-  { id: 'combat', label: '[combat]', desc: 'Solo si estás en combate.', default: false },
-  { id: 'nostance', label: '[nostance]', desc: 'Solo si no estás en una forma/actitud específica. [VERIFICAR sintaxis/contexto]', default: false },
-  { id: 'mod', label: '[mod:shift/ctrl/alt]', desc: 'Ramas condicionales reales por modificador (no aplica a /castsequence). Usa los checkboxes de modificadores.', default: false }
-];
-
-const MACRO_META = { charLimit: 255, sourceNote: 'Datos comunitarios; [VERIFICAR Forever] en fuentes autorizadas.' };
-
+// Compatibilidad: los objetos SPELLS y RACIALS se poblan de forma asíncrona.
+// El resto de la app puede leerlos una vez inicializados DataService.
+const SPELLS = {};
+const RACIALS = {};

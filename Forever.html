@@ -523,6 +523,24 @@ select:focus, input:focus {
   .config-row { flex-direction: column; align-items: stretch; }
   select, input[type="text"] { width: 100%; }
 }
+.faction-buttons{display:flex;gap:8px;flex-wrap:wrap}
+.faction-btn{display:inline-flex;align-items:center;justify-content:center;padding:0;border:none;background:none;cursor:pointer;}
+.faction-btn.alliance{border-color:#0070dd}
+.faction-btn.horde{border-color:#ff0000}
+.thanos-toast{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:9999;background:rgba(0,0,0,.85);pointer-events:all;animation:thanosSnap 2.5s ease-out forwards}
+.thanos-toast .msg{padding:24px 36px;border-radius:12px;font-weight:700;font-size:28px;color:#fff;text-align:center;box-shadow:0 0 40px currentColor}
+.thanos-toast.alliance .msg{background:linear-gradient(135deg,#003366,#0070dd);box-shadow:0 0 40px #0070dd}
+.thanos-toast.horde .msg{background:linear-gradient(135deg,#4a0000,#ff0000);box-shadow:0 0 40px #ff0000}
+@keyframes thanosSnap{0%{opacity:0}15%{opacity:1}60%{opacity:1}100%{opacity:0}}
+.thanos-overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:99999;background:rgba(0,0,0,.85);animation:overlayFade 2.6s ease forwards}
+.thanos-msg{padding:24px 36px;border-radius:12px;font-weight:700;font-size:28px;color:#fff;text-align:center;box-shadow:0 0 40px currentColor;animation:thanosSnap 2.6s ease forwards}
+.thanos-msg.alliance{background:linear-gradient(135deg,#003366,#0070dd);box-shadow:0 0 40px #0070dd}
+.thanos-msg.horde{background:linear-gradient(135deg,#4a0000,#ff0000);box-shadow:0 0 40px #ff0000}
+@keyframes overlayFade{0%{opacity:0}10%{opacity:1}80%{opacity:1}100%{opacity:0}}
+@keyframes thanosSnap{0%{opacity:0;transform:scale(.9);filter:blur(6px)}12%{opacity:1;transform:scale(1.02);filter:blur(0)}70%{opacity:1;transform:scale(1);filter:blur(0)}100%{opacity:0;transform:scale(.85);filter:blur(10px)}}
+<link rel="icon" href="assets/logo.png" type="image/png">
+<link rel="shortcut icon" href="assets/logo.png" type="image/png">
+<link rel="manifest" href="manifest.json">
 </style>
 </head>
 <body>
@@ -548,6 +566,13 @@ select:focus, input:focus {
         <select id="classSelect" onchange="onClassChange()">
           <option value="">— Selecciona clase —</option>
         </select>
+      </div>
+      <div class="config-group">
+        <label>Facción</label>
+        <div class="faction-buttons">
+          <button type="button" class="faction-btn alliance" onclick="selectFaction('alliance')" aria-label="Alianza"><img src="assets/alianza.png" alt="Alianza" width="64" height="64" style="object-fit:cover;border-radius:8px;"></button>
+          <button type="button" class="faction-btn horde" onclick="selectFaction('horde')" aria-label="Horda"><img src="assets/horda.png" alt="Horda" width="52" height="52" style="object-fit:cover;border-radius:8px;"></button>
+        </div>
       </div>
       <div class="config-group">
         <label>Raza</label>
@@ -1488,6 +1513,56 @@ function switchTab(tabName) {
   
   document.getElementById(`tab-${tabName}`).classList.add('active');
   event.target.classList.add('active');
+}
+
+function selectFaction(faction){
+  const raceSelect=document.getElementById('raceSelect');
+  raceSelect.innerHTML='<option value="">— Selecciona raza —</option>';
+  try {
+    Object.entries(RACES).forEach(([key,r])=>{
+      if(r.faction===faction){
+        const opt=document.createElement('option');
+        opt.value=key; opt.textContent=r.name;
+        raceSelect.appendChild(opt);
+      }
+    });
+  } catch(e){ console.error('RACES error', e); }
+  showToast(faction==='alliance'?'Firmes por la Patria':'Zurdos Mariquitas',faction);
+}
+function showToast(text,faction){
+  document.querySelectorAll('.thanos-fade').forEach(n=>n.remove());
+  const el=document.createElement('div');
+  const color=faction==='alliance'?'#0070dd':'#ff0000';
+  const logo=faction==='alliance'?'assets/alianza.png':'assets/horda.png';
+  el.className='thanos-fade';
+  el.style.cssText='position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:99999;pointer-events:none;font-family:"Cinzel",serif;';
+  const box=document.createElement('div');
+  box.style.cssText='display:flex;flex-direction:column;align-items:center;gap:12px;';
+  const img=document.createElement('img');
+  img.src=logo;
+  img.style.cssText='width:128px;height:128px;object-fit:contain;opacity:0;transition:opacity .5s ease;';
+  box.appendChild(img);
+  const msg=document.createElement('div');
+  msg.style.cssText='font-size:42px;font-weight:700;text-align:center;color:'+color+';text-shadow:0 0 14px '+color+';letter-spacing:2px;';
+  const chars=text.split('');
+  const spans=[];
+  chars.forEach((ch,i)=>{
+    const s=document.createElement('span');
+    s.textContent=ch===' '?'\u00A0':ch;
+    s.style.cssText='opacity:0;transition:opacity .35s ease;display:inline-block;white-space:pre;';
+    s.style.transitionDelay=(i*0.08)+'s';
+    msg.appendChild(s);
+    spans.push(s);
+  });
+  box.appendChild(msg);
+  el.appendChild(box);
+  document.body.appendChild(el);
+  requestAnimationFrame(()=>{ img.style.opacity='1'; spans.forEach(s=>{ s.style.opacity='1'; }); });
+  setTimeout(()=>{
+    img.style.opacity='0';
+    spans.forEach((s,i)=>{ s.style.transitionDelay=(i*0.06)+'s'; s.style.opacity='0'; });
+    setTimeout(()=>el.remove(), (spans.length*0.06+0.6)*1000);
+  }, 2200);
 }
 
 // Iniciar al cargar

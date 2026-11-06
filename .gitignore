@@ -6,3 +6,12 @@ Thumbs.db
 
 # temp download scripts
 *.ps1.tmp
+
+# Dependencies
+node_modules/
+package-lock.json
+
+# Generated assets (do not commit)
+favicon.ico
+assets/icons/small/
+assets/icons/catalog/

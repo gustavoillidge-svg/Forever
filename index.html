@@ -4,8 +4,32 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WoW Forever — Generador de Macros</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://wowforever.news" crossorigin>
+<link rel="preload" as="image" href="assets/logo.png" fetchpriority="high">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="css/style.css">
+<style>
+.faction-buttons{display:flex;gap:8px;flex-wrap:wrap}
+.faction-btn{display:inline-flex;align-items:center;justify-content:center;padding:0;border:none;background:none;cursor:pointer;}
+.thanos-overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:99999;background:rgba(0,0,0,.85);animation:overlayFade 2.6s ease forwards}
+.thanos-msg{padding:24px 36px;border-radius:12px;font-weight:700;font-size:28px;color:#fff;text-align:center;box-shadow:0 0 40px currentColor;animation:thanosSnap 2.6s ease forwards}
+.thanos-msg.alliance{background:linear-gradient(135deg,#003366,#0070dd);box-shadow:0 0 40px #0070dd}
+.thanos-msg.horde{background:linear-gradient(135deg,#4a0000,#ff0000);box-shadow:0 0 40px #ff0000}
+@keyframes overlayFade{0%{opacity:0}10%{opacity:1}80%{opacity:1}100%{opacity:0}}
+@keyframes thanosSnap{0%{opacity:0;transform:scale(.9);filter:blur(6px)}12%{opacity:1;transform:scale(1.02);filter:blur(0)}70%{opacity:1;transform:scale(1);filter:blur(0)}100%{opacity:0;transform:scale(.85);filter:blur(10px)}}
+.faction-btn.alliance{border-color:#0070dd}
+.faction-btn.horde{border-color:#ff0000}
+.feedback-icon{width:112px;height:112px;object-fit:contain;}
+.feedback-btn{position:fixed;bottom:20px;right:20px;z-index:1000;background:none;border:none;padding:0;cursor:pointer;display:inline-flex;align-items:center;gap:8px;}
+.feedback-glow{animation:feedbackGlow 1.5s infinite alternate;box-shadow:0 0 30px #25d366,0 0 60px rgba(37,211,102,.35);}
+@keyframes feedbackGlow{from{transform:scale(1)}to{transform:scale(1.35)}}
+.rickroll-wrap{display:none;position:fixed;inset:0;align-items:center;justify-content:center;z-index:9999;background:rgba(0,0,0,.85);}
+.rickroll-img{max-width:90vw;max-height:85vh;object-fit:contain;border-radius:12px;box-shadow:0 0 40px #ff0000;}
+</style>
 <link rel="manifest" href="manifest.json">
+<link rel="icon" href="assets/logo.png" type="image/png">
+<link rel="shortcut icon" href="assets/logo.png" type="image/png">
 <meta name="theme-color" content="#016787">
 <meta name="color-scheme" content="light">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
@@ -17,7 +41,7 @@
     <span class="brand-text">Generador de Macros<span class="brand-sub">Herramienta comunitaria · datos no oficiales</span></span>
   </a>
   <div class="spacer"></div>
-  <a class="tag" href="https://www.youtube.com/watch?v=oHg5SJYRHA0" target="_blank" rel="noopener noreferrer">🎁 Consigue WoW Forever gratis</a>
+  <a class="tag" href="https://www.youtube.com/watch?v=oHg5SJYRHA0" target="_blank" rel="noopener noreferrer"><img src="assets/logo.png" alt="" class="tag-logo" aria-hidden="true"><span>Token gratis</span></a>
 </header>
 
 <!-- Pestaña de talentos oculta: foco en generador de macros -->
@@ -31,6 +55,7 @@
     <h3>⚙️ Configuración del Personaje</h3>
     <div class="config-row">
       <div class="config-group"><label for="classSelect">Clase</label><select id="classSelect" onchange="onClassChange()" aria-label="Clase"><option value="">— Selecciona clase —</option></select></div>
+      <div class="config-group"><label>Facción</label><div class="faction-buttons"><button type="button" class="faction-btn alliance" onclick="selectFaction('alliance')" aria-label="Alianza"><img src="assets/alianza.png" alt="Alianza" width="64" height="64" loading="lazy"></button><button type="button" class="faction-btn horde" onclick="selectFaction('horde')" aria-label="Horda"><img src="assets/horda.png" alt="Horda" width="52" height="52" loading="lazy"></button></div></div>
       <div class="config-group"><label for="raceSelect">Raza</label><select id="raceSelect" onchange="onRaceChange()" aria-label="Raza"><option value="">— Selecciona raza —</option></select></div>
       <div class="config-group"><label for="levelInput">Nivel (1-60)</label><input type="number" id="levelInput" min="1" max="60" value="60" onchange="onLevelChange()" style="min-width:100px;" aria-label="Nivel"></div>
       <div class="config-group"><label for="macroLang">Idioma de hechizos</label><select id="macroLang" onchange="onMacroLangChange()" aria-label="Idioma de nombres de hechizos en el macro"><option value="es">Español (cliente ES)</option><option value="en">English (EN client)</option></select></div>
@@ -40,6 +65,11 @@
   <div class="config-panel">
     <h3>✨ Hechizos Disponibles (arrastra a la secuencia)</h3>
     <input type="text" id="spellSearch" placeholder="Buscar hechizo (ES/EN)..." oninput="filterSpellPool()" style="width:100%;margin-bottom:8px;" aria-label="Buscar hechizo">
+    <select id="spellTypeFilter" onchange="filterSpellPool()" style="width:100%;margin-bottom:8px;" aria-label="Filtrar por tipo de hechizo">
+      <option value="all">Todos los tipos</option>
+      <option value="spell">Hechizos</option>
+      <option value="racial">Raciales</option>
+    </select>
     <div class="spell-pool" id="spellPool" aria-label="Hechizos disponibles"><div class="empty-hint">Selecciona clase y raza para ver los hechizos disponibles.</div></div>
   </div>
   <div class="config-panel">
@@ -88,9 +118,89 @@
   <div class="talent-container"><div class="talent-trees" id="talentTrees"></div><div class="talent-info-panel" id="talentInfoPanel"><h4>Información del Talento</h4><div class="talent-desc">Selecciona un talento.</div></div></div>
 </div>
 
-<script src="js/data.js"></script>
-<script src="js/macros.js"></script>
-<script src="js/talents.js"></script>
-<script src="js/app.js"></script>
+<button id="feedbackBtn" class="feedback-btn"><img src="assets/whatsapp.png" alt="WhatsApp" class="feedback-icon"></button>
+<div id="rickrollWrap" class="rickroll-wrap">
+  <img id="rickrollImg" src="assets/rickroll.jpg" alt="rickroll" class="rickroll-img">
+</div>
+
+<script defer src="js/data.js"></script>
+<script defer src="js/macros.js"></script>
+<script defer src="js/talents.js"></script>
+<script defer src="js/app.js"></script>
+<script>
+function selectFaction(faction){
+  const raceSelect=document.getElementById('raceSelect');
+  raceSelect.innerHTML='<option value="">— Selecciona raza —</option>';
+  try {
+    Object.entries(RACES).forEach(([key,r])=>{
+      if(r.faction===faction){
+        const opt=document.createElement('option');
+        opt.value=key; opt.textContent=r.name;
+        raceSelect.appendChild(opt);
+      }
+    });
+  } catch(e){ console.error('RACES error', e); }
+  showToast(faction==='alliance'?'Firmes por la Patria':'Zurdos Mariquitas',faction);
+}
+function showToast(text,faction){
+  document.querySelectorAll('.thanos-fade').forEach(n=>n.remove());
+  const el=document.createElement('div');
+  const color=faction==='alliance'?'#0070dd':'#ff0000';
+  const logo=faction==='alliance'?'assets/alianza.png':'assets/horda.png';
+  el.className='thanos-fade';
+  el.style.cssText='position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:99999;pointer-events:none;font-family:"Cinzel",serif;';
+  const box=document.createElement('div');
+  box.style.cssText='display:flex;flex-direction:column;align-items:center;gap:12px;';
+  const img=document.createElement('img');
+  img.src=logo;
+  img.style.cssText='width:128px;height:128px;object-fit:contain;opacity:0;transition:opacity .5s ease;';
+  box.appendChild(img);
+  const msg=document.createElement('div');
+  msg.style.cssText='font-size:42px;font-weight:700;text-align:center;color:'+color+';text-shadow:0 0 14px '+color+';letter-spacing:2px;';
+  const chars=text.split('');
+  const spans=[];
+  chars.forEach((ch,i)=>{
+    const s=document.createElement('span');
+    s.textContent=ch===' '?'\u00A0':ch;
+    s.style.cssText='opacity:0;transition:opacity .35s ease;display:inline-block;white-space:pre;';
+    s.style.transitionDelay=(i*0.08)+'s';
+    msg.appendChild(s);
+    spans.push(s);
+  });
+  box.appendChild(msg);
+  el.appendChild(box);
+  document.body.appendChild(el);
+  requestAnimationFrame(()=>{ img.style.opacity='1'; spans.forEach(s=>{ s.style.opacity='1'; }); });
+  setTimeout(()=>{
+    img.style.opacity='0';
+    spans.forEach((s,i)=>{ s.style.transitionDelay=(i*0.06)+'s'; s.style.opacity='0'; });
+    setTimeout(()=>el.remove(), (spans.length*0.06+0.6)*1000);
+  }, 2200);
+}
+const FEEDBACK_KEY = 'wf_feedback_clicks';
+const feedbackBtn = document.getElementById('feedbackBtn');
+const rickrollWrap = document.getElementById('rickrollWrap');
+document.addEventListener('DOMContentLoaded', () => {
+  let feedbackClicks = parseInt(localStorage.getItem(FEEDBACK_KEY) || '0', 10);
+  feedbackBtn.addEventListener('click', function(e){
+    feedbackClicks++;
+    localStorage.setItem(FEEDBACK_KEY, String(feedbackClicks));
+    this.classList.add('feedback-glow');
+    if (feedbackClicks < 6) {
+      e.preventDefault();
+      rickrollWrap.style.display = 'flex';
+      setTimeout(()=>{ rickrollWrap.style.display = 'none'; }, 1200);
+      const maxX = Math.max(0, window.innerWidth - this.offsetWidth);
+      const maxY = Math.max(0, window.innerHeight - this.offsetHeight);
+      this.style.left = Math.random() * maxX + 'px';
+      this.style.top = Math.random() * maxY + 'px';
+      this.style.bottom = 'auto';
+      this.style.right = 'auto';
+    } else {
+      window.location.href = 'https://wa.me/gustavoillidge';
+    }
+  });
+});
+</script>
 </body>
 </html>

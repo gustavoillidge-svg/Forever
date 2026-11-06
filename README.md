@@ -1,65 +1,123 @@
-# Wow Forever Tool
+# WoW Forever — Generador de Macros
 
-Herramienta web para World of Warcraft. Proyecto estático (HTML, CSS, JavaScript) con soporte PWA mediante service worker y manifiesto.
+Herramienta comunitaria (no oficial) para generar macros de estilo WoW Forever con datos dinámicos de la Forever News API.
 
-## Estructura
+## Índice
 
-```
-wow-forever-tool/
-├── index.html          # Punto de entrada principal
-├── Forever.html        # Vista principal de la herramienta
-├── manifest.json       # Manifiesto de la PWA
-├── service-worker.js   # Service worker para cacheo offline
-├── .gitignore          # Archivos ignorados por git
-├── assets/             # Recursos estáticos (iconos, catálogos)
-│   └── icons/
-│       └── catalog/
-├── css/                # Hojas de estilo
-├── icons/              # Iconos del proyecto
-└── js/                 # Lógica de JavaScript
-```
+- [Características](#características)
+- [Estructura del proyecto](#estructura-del-proyecto)
+- [Iconos y marca](#iconos-y-marca)
+- [Botón de comentarios (WhatsApp)](#botón-de-comentarios-whatsapp)
+- [API utilizada](#api-utilizada)
+- [Instalación y uso](#instalación-y-uso)
+- [PWA](#pwa)
+- [Pruebas](#pruebas)
+- [Generar iconos PWA y favicon](#generar-iconos-pwa-y-favicon)
+- [Optimizaciones de rendimiento](#optimizaciones-de-rendimiento)
+- [Avisos](#avisos)
+- [Licencia](#licencia)
 
-## Requisitos
+## Características
 
-Navegador web moderno con soporte para service workers y manifiesto de PWA.
+- **Generador de macros**: arrastra hechizos a la secuencia, configura condiciones (`[help]`, `[harm]`, `[@mouseover]`, modificadores, `castsequence`, etc.), genera y copia el macro al portapapeles.
+- **Datos dinámicos**: hechizos, raciales y talentos se cargan de la Forever News API (`https://wowforever.news/api/v1/...`) con caché localStorage (24h TTL), `AbortController` para cancelar peticiones obsoletas y fallback a datos embebidos.
+- **Simulador de talentos**: 9 clases × 3 árboles, hasta 51 puntos, tooltips por talento.
+- **PWA**: instalable, funciona offline (assets estáticos en caché, API con stale-while-revalidate).
+- **Persistencia**: selección de clase/raza/nivel, opciones y secuencia se guardan en localStorage.
+- **Contador de comentarios persistente**: el botón de WhatsApp guarda su conteo en `localStorage`, por lo que sobrevive a refrescos de página.
 
-## Uso
+## Iconos y marca
 
-Abre `index.html` en el navegador o despliega el proyecto en un servidor web estático (GitHub Pages, Netlify, Vercel, etc.).
+Todos los iconos de la aplicación (navegador, pestaña, acceso directo de carpeta y PWA) usan el logo de Forever (`assets/logo.png`):
 
-## Tecnologías
+| Ubicación | Archivo | Propósito |
+|-----------|---------|-----------|
+| Navegador / pestaña | `assets/logo.png` | `<link rel="icon">` y `<link rel="shortcut icon">` en `index.html` y `Forever.html` |
+| Acceso directo Windows / carpeta | `favicon.ico` | Generado en raíz con 6 tamaños (16–256 px) a partir del logo |
+| Instalación PWA | `assets/logo.png` | Único icono en `manifest.json` |
+| Apple touch icon | `icons/icon-192.png` | `<link rel="apple-touch-icon">` |
 
-- HTML5
-- CSS3
-- JavaScript (ES6+)
-- Service Workers (PWA)
-- Web App Manifest
+Los iconos PWA (`icons/icon-192.png`, `icons/icon-512.png`) se mantienen para compatibilidad, pero el manifiesto ahora apunta al logo de Forever.
 
-## Funciones (macro)
+## Botón de comentarios (WhatsApp)
 
-- `/cast`, `/castsequence reset=target`, `#showtooltip`, modificadores reales `[mod:shift/ctrl/alt]` y condiciones (`@mouseover`, `help/harm`, `nodead`, `exists`, `combat`, `nostance`).
-- Copiar portapapeles: **solo macro** (sin advertencias); conserva `#showtooltip` y líneas de comando. Fallback accesible si Clipboard API falla.
-- Advertencias separadas en UI + validación de sintaxis básica y límite típico **255 caracteres**.
-- `/cancelaura` con input inline (sin `prompt()`), nombre saneado.
-- Selección de idioma de salida de hechizos (ES/EN, según cliente) `[VERIFICAR]` nombres localizados.
-- Filtro raza↔clase (referencia Classic) con fallback permisivo; combinaciones Forever marcadas `[VERIFICAR Forever]`.
-- Reordenar secuencia (drag de slots) y persistencia local (`localStorage`, versión).
-- Datos con marcas `[VERIFICAR Forever]` cuando no se confirmaron contra fuentes autorizadas.
+Ubicado en `index.html` (esquina inferior derecha), usa `assets/whatsapp.png` como ícono (112×112 px, botón transparente sin fondo ni borde).
 
-## Assets
+**Flujo (truco rickroll ×6):**
 
-Recursos en `assets/` y `icons/`. Catálogos: `assets/icons/catalog/` (incluye índice Wowhead/nether, 33,097 nombres). Descarga masiva reanudable (no subir 33k binarios al repo normal sin decisión): `powershell -ExecutionPolicy Bypass -File scripts/download_all_icons.ps1`. Páginas Wowhead/Forever directas pueden devolver 403 según entorno; usar fuentes autorizadas/export.
+1. Al hacer clic, se muestra brevemente la imagen de rickroll (`assets/rickroll.jpg`) durante 1.2 s.
+2. El botón se mueve a una posición aleatoria de la pantalla.
+3. Desde el primer clic, el botón adquiere la clase `.feedback-glow`: brillo verde WhatsApp (`#25d366`) y escala creciente (animación GPU-composited).
+4. Los clics 1 a 5 repiten el ciclo (rickroll + movimiento).
+5. En el **6.º clic**, el botón redirige a `https://wa.me/gustavoillidge` (WhatsApp @gustavoillidge).
+6. El conteo se guarda en `localStorage` (`wf_feedback_clicks`), por lo que persiste al refrescar la página.
+
+## API utilizada
+
+- **Forever News Data API**: `https://wowforever.news/api/v1/talents?class={clase}`, `/api/v1/spells?class={clase}`, `/api/v1/racials?race={raza}` — no requiere clave de API.
+- **ForeverDB API**: requiere clave de API (`https://foreverdb.net/developers`) — no usada por defecto.
+
+Iconos de hechizos: `https://wowforever.news/icons/{icono}.png`
+
+## Instalación y uso
+
+1. Clona o descarga este repositorio.
+2. Abre `index.html` en un navegador moderno (o sirve con un servidor local, ej. `python -m http.server` o `npx serve`).
+3. Selecciona clase y raza (solo combinaciones válidas para Forever).
+4. Arrastra hechizos del pool a la secuencia, ajusta opciones y genera el macro.
+5. Copia el macro al portapapeles.
+6. (Opcional) Usa el botón de WhatsApp para enviar comentarios.
+
+## PWA
+
+- El manifiesto en `manifest.json` permite instalar la app como PWA.
+- El service worker (`service-worker.js`) almacena en caché los assets estáticos y usa stale-while-revalidate para las respuestas de la API.
 
 ## Pruebas
 
+Ejecutar las pruebas unitarias del generador de macros:
+
 ```bash
 node tests/macro.test.js
-node --check js/data.js && node --check js/macros.js && node --check js/talents.js && node --check js/app.js
 ```
+
+Se esperan 12 pruebas pasando (exit code 0).
+
+## Generar iconos PWA y favicon
+
+Los iconos PWA ya están generados (`icons/icon-192.png`, `icons/icon-512.png`). Para regenerarlos:
+
+```bash
+node scripts/generate-icons.js
+```
+
+Requiere `canvas` (ya en `package.json`).
+
+El `favicon.ico` (6 tamaños, 16–256 px) se genera a partir de `assets/logo.png`:
+
+```bash
+node scripts/generate-favicon.js
+```
+
+Requiere `canvas`.
+
+## Optimizaciones de rendimiento
+
+- **Ruta crítica de carga**: `<link rel="preconnect">` a `fonts.googleapis.com` y `wowforever.news`; `<link rel="preload" fetchpriority="high">` del `logo.png`; fuente Google Fonts cargada no bloqueante (`media="print" onload="this.media='all'"`).
+- **Scripts diferidos**: todos los `<script>` usan `defer`.
+- **Imágenes lazy**: `loading="lazy"` en iconos de facción.
+- **CSS sin `@import` bloqueante**: eliminada la importación de fuentes en CSS.
+- **Animaciones GPU-composited**: `.feedback-glow` anima solo `transform` (brillo estático en `box-shadow`).
+- **`content-visibility: auto`**: en paneles para render diferido fuera del viewport.
+- **Debounce de búsqueda**: `filterSpellPool` con 120 ms de debounce para evitar re-renders por cada tecla.
+- **AbortController**: las peticiones a la API se cancelan cuando cambian de clase/raza rápidamente, evitando condiciones de race.
+
+## Avisos
+
+- Datos comunitarios no oficiales. Nombres, niveles y disponibilidad pueden variar.
+- Sin afiliación con Blizzard Entertainment ni con los servidores Forever.
+- Algunos datos están marcados como `[VERIFICAR Forever]` y requieren confirmación en fuentes autorizadas.
 
 ## Licencia
 
-MIT
-
----
-Última actualización: noviembre 2026 (v1.1.0, SW v7)
+Uso comunitario, sin garantías.

@@ -11,6 +11,33 @@ let sequence = []; // { name,nameEn,icon,level,type,role,desc,uid }
 let allAbilitiesCache = [];
 let _drag = { spell: null, seqFrom: null, seqId: null };
 const STORAGE_KEY = 'wow_forever_macro_v1';
+const _debounceCache = {};
+function debounce(fn, wait) {
+  const key = fn.name || String(fn);
+  if (_debounceCache[key]) return _debounceCache[key];
+  let t;
+  const g = function(){ const a=arguments, ctx=this; clearTimeout(t); t=setTimeout(function(){ fn.apply(ctx, a); }, wait); };
+  _debounceCache[key] = g;
+  return g;
+}
+
+// Opciones de comportamiento del macro (id, label, desc, default)
+const MACRO_OPTIONS = [
+  { id: 'showtooltip', label: '#showtooltip', desc: 'Muestra el tooltip del hechizo en el cursor al usar el macro.', default: true },
+  { id: 'stopcasting', label: '/stopcasting', desc: 'Cancela el hechizo actual antes de lanzar.', default: false },
+  { id: 'startattack', label: '/startattack', desc: 'Inicia ataque automático al objetivo.', default: false },
+  { id: 'petattack', label: '/petattack', desc: 'Ordena a la mascota atacar al objetivo.', default: false },
+  { id: 'cancelaura', label: '/cancelaura nombre', desc: 'Cancela un aura/buff específico antes de lanzar (ej: Bloque de Hielo).', default: false },
+  { id: 'castsequence', label: '/castsequence', desc: 'Lanza los hechizos en secuencia (reset=target). No compatible con modificadores.', default: false },
+  { id: 'mouseover', label: '[@mouseover]', desc: 'Lanza el hechizo sobre el puntero del ratón si existe.', default: false },
+  { id: 'harm', label: '[harm]', desc: 'Solo si el objetivo es hostil.', default: false },
+  { id: 'help', label: '[help]', desc: 'Solo si el objetivo es amistoso.', default: false },
+  { id: 'nodead', label: '[nodead]', desc: 'Solo si el objetivo no está muerto.', default: false },
+  { id: 'exists', label: '[exists]', desc: 'Solo si el objetivo existe.', default: false },
+  { id: 'combat', label: '[combat]', desc: 'Solo si estás en combate.', default: false },
+  { id: 'nostance', label: '[nostance]', desc: 'Sin restricción de postura/forma.', default: false },
+  { id: 'mod', label: 'Ramas [mod]', desc: 'Genera ramas condicionales por modificador (Shift/Ctrl/Alt).', default: false }
+];
 
 // ---------- Utilidades puras (testeables) ----------
 function spellDisplayName(s, lang) {
@@ -79,6 +106,9 @@ function buildMacro(seq, opts) {
     lines.push('/castsequence reset=target ' + (condStr ? condStr + ' ' : '') + names.join(', '));
     if (mods.length) warnings.push('Modificadores no aplicados a /castsequence.');
   } else if (mods.length) {
+    // Rama condicional real por modificador
+    // Si solo Shift: /cast [mod:shift] H1; H2
+    // Si Shift+Ctrl: /cast [mod:shift] H1; [mod:ctrl] H2; H3
     const branches = mods.map(function (m, i) {
       const mc = condStr ? '[mod:' + m + ',' + condParts.join(',') + ']' : '[mod:' + m + ']';
       return mc + ' ' + names[Math.min(i, names.length - 1)];
@@ -125,7 +155,7 @@ function renderWarnings(warnings, meta) {
   el.innerHTML = head + list; el.style.display = 'block';
 }
 function iconFallbackImg(img, icon) {
-  img.onerror = function () { this.onerror = function () { this.onerror = null; this.src = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><rect width="24" height="24" rx="6" fill="#e8eef2"/><text x="12" y="16" font-size="10" text-anchor="middle" fill="#6e6e73">?</text></svg>'); }; this.src = 'assets/icons/small/' + icon + '.jpg'; };
+  img.onerror = function () { this.onerror = function () { this.onerror = null; this.src = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><rect width="24" height="24" rx="6" fill="#e8eef2"/><text x="12" y="16" font-size="10" text-anchor="middle" fill="#6e6e73">?</text></svg>'); }; this.src = (typeof DataService !== 'undefined' ? DataService.iconUrl(icon || 'inv_misc_questionmark') : 'https://wow.zamimg.com/images/wow/icons/small/' + (icon || 'inv_misc_questionmark') + '.jpg'); };
 }
 function uid() { return 's' + Math.random().toString(36).slice(2, 9); }
 
@@ -161,26 +191,38 @@ function initSelects() {
   const talentClassSelect = document.getElementById('talentClassSelect');
   if (classSelect) {
     classSelect.innerHTML = '<option value="">— Selecciona clase —</option>';
-    Object.entries(CLASSES).forEach(function (kv) { const o = document.createElement('option'); o.value = kv[0]; o.textContent = kv[1].name + ' (' + kv[1].nameEn + ')'; classSelect.appendChild(o); });
+    Object.entries(CLASSES).forEach(function (kv) {
+      const o = document.createElement('option');
+      o.value = kv[0];
+      const iconUrl = typeof DataService !== 'undefined' ? DataService.iconUrl(kv[1].icon) : '';
+      o.innerHTML = '<img src="' + iconUrl + '" class="select-icon" style="width:14px;height:14px;vertical-align:middle;margin-right:6px;border:1px solid rgba(0,0,0,.12);border-radius:4px;"> <strong>' + escapeHtml(kv[1].name) + '</strong> <span style="color:var(--muted-2);font-size:0.82em;">(' + escapeHtml(kv[1].nameEn) + ')</span>';
+      classSelect.appendChild(o);
+    });
   }
   if (talentClassSelect) {
     talentClassSelect.innerHTML = '<option value="">— Selecciona clase —</option>';
-    Object.entries(CLASSES).forEach(function (kv) { const o = document.createElement('option'); o.value = kv[0]; o.textContent = kv[1].name + ' (' + kv[1].nameEn + ')'; talentClassSelect.appendChild(o); });
+    Object.entries(CLASSES).forEach(function (kv) {
+      const o = document.createElement('option');
+      o.value = kv[0];
+      const iconUrl = typeof DataService !== 'undefined' ? DataService.iconUrl(kv[1].icon) : '';
+      o.innerHTML = '<img src="' + iconUrl + '" class="select-icon" style="width:14px;height:14px;vertical-align:middle;margin-right:6px;border:1px solid rgba(0,0,0,.12);border-radius:4px;"> <strong>' + escapeHtml(kv[1].name) + '</strong> <span style="color:var(--muted-2);font-size:0.82em;">(' + escapeHtml(kv[1].nameEn) + ')</span>';
+      talentClassSelect.appendChild(o);
+    });
   }
 }
-function onClassChange() {
+async function onClassChange() {
   currentClass = document.getElementById('classSelect').value || null;
   if (currentRace && !raceAllowsClass(currentRace, currentClass)) currentRace = null;
-  updateRaceOptions(); updateSpellPool(); persistState();
+  updateRaceOptions(); await updateSpellPool(); persistState();
 }
-function onRaceChange() { currentRace = document.getElementById('raceSelect').value || null; updateSpellPool(); persistState(); }
+async function onRaceChange() { currentRace = document.getElementById('raceSelect').value || null; await updateSpellPool(); persistState(); }
 function onLevelChange() {
   currentLevel = Math.max(1, Math.min(60, parseInt(document.getElementById('levelInput').value, 10) || 60));
   document.getElementById('levelInput').value = currentLevel; updateSpellPool(); persistState();
 }
 function onMacroLangChange() { macroLang = (document.getElementById('macroLang') || {}).value === 'en' ? 'en' : 'es'; persistState(); }
 
-function updateRaceOptions() {
+async function updateRaceOptions() {
   const raceSelect = document.getElementById('raceSelect'); if (!raceSelect) return;
   const prev = currentRace;
   raceSelect.innerHTML = '<option value="">— Selecciona raza —</option>';
@@ -188,34 +230,61 @@ function updateRaceOptions() {
   const allowed = validRacesForClass(currentClass);
   Object.entries(RACES).forEach(function (kv) {
     if (allowed.indexOf(kv[0]) === -1) return;
-    const opt = document.createElement('option'); opt.value = kv[0]; opt.textContent = kv[1].name + ' (' + kv[1].nameEn + ')'; raceSelect.appendChild(opt);
+    const opt = document.createElement('option');
+    opt.value = kv[0];
+    const iconUrl = typeof DataService !== 'undefined' ? DataService.iconUrl(kv[1].icon) : '';
+    opt.innerHTML = '<img src="' + iconUrl + '" class="select-icon" style="width:14px;height:14px;vertical-align:middle;margin-right:6px;border:1px solid rgba(0,0,0,.12);border-radius:4px;"> <strong>' + escapeHtml(kv[1].name) + '</strong> <span style="color:var(--muted-2);font-size:0.82em;">(' + escapeHtml(kv[1].nameEn) + ')</span>';
+    raceSelect.appendChild(opt);
   });
   if (prev && allowed.indexOf(prev) !== -1) { raceSelect.value = prev; currentRace = prev; }
   else { currentRace = null; raceSelect.value = ''; }
 }
 
 // ---------- Spell pool ----------
-function updateSpellPool() {
+async function updateSpellPool() {
   const pool = document.getElementById('spellPool'); if (!pool) return;
   pool.innerHTML = '';
   const search = document.getElementById('spellSearch'); if (search) search.value = '';
   if (!currentClass) { allAbilitiesCache = []; pool.innerHTML = '<div class="empty-hint">Selecciona clase y raza para ver los hechizos disponibles.</div>'; return; }
   if (currentRace && !raceAllowsClass(currentRace, currentClass)) { allAbilitiesCache = []; pool.innerHTML = '<div class="empty-hint">Combinación raza/clase no válida para esta configuración. [VERIFICAR Forever]</div>'; return; }
-  const spells = (typeof SPELLS !== 'undefined' && SPELLS[currentClass]) ? SPELLS[currentClass] : [];
-  const racials = (typeof RACIALS !== 'undefined' && currentRace && RACIALS[currentRace]) ? RACIALS[currentRace] : [];
-  const extra = (typeof RACIALS !== 'undefined' && currentRace && RACIALS[currentRace + '_extra']) ? RACIALS[currentRace + '_extra'] : [];
+
+  // Cargar hechizos desde DataService (API con caché)
+  let spells = [];
+  try {
+    spells = await DataService.getSpells(currentClass, macroLang);
+  } catch (e) {
+    console.warn('Error cargando hechizos:', e);
+    spells = (typeof SPELLS !== 'undefined' && SPELLS[currentClass]) ? SPELLS[currentClass] : [];
+  }
+
+  // Cargar raciales desde DataService
+  let racials = [];
+  if (currentRace) {
+    try {
+      racials = await DataService.getRacials(currentRace, macroLang);
+    } catch (e) {
+      console.warn('Error cargando raciales:', e);
+      racials = (typeof RACIALS !== 'undefined' && RACIALS[currentRace]) ? RACIALS[currentRace] : [];
+    }
+  }
+
   allAbilitiesCache = [].concat(
     spells.map(function (s) { return Object.assign({}, s, { type: 'spell' }); }),
-    racials.map(function (r) { return Object.assign({}, r, { type: 'racial' }); }),
-    extra.map(function (r) { return Object.assign({}, r, { type: 'racial' }); })
+    racials.map(function (r) { return Object.assign({}, r, { type: 'racial' }); })
   ).filter(function (a) { return (a.level || 1) <= currentLevel; });
   renderSpellPool(allAbilitiesCache);
 }
-function filterSpellPool() {
+function _filterSpellPoolRaw() {
   const q = ((document.getElementById('spellSearch') || {}).value || '').toLowerCase().trim();
-  if (!q) { renderSpellPool(allAbilitiesCache); return; }
-  renderSpellPool(allAbilitiesCache.filter(function (a) { return ((a.name || '') + ' ' + (a.nameEn || '')).toLowerCase().indexOf(q) !== -1; }));
+  const typeFilter = (document.getElementById('spellTypeFilter') || {}).value || 'all';
+  if (!q && typeFilter === 'all') { renderSpellPool(allAbilitiesCache); return; }
+  renderSpellPool(allAbilitiesCache.filter(function (a) {
+    const matchText = !q || ((a.name || '') + ' ' + (a.nameEn || '')).toLowerCase().indexOf(q) !== -1;
+    const matchType = typeFilter === 'all' || a.type === typeFilter;
+    return matchText && matchType;
+  }));
 }
+const filterSpellPool = debounce(_filterSpellPoolRaw, 120);
 function renderSpellPool(abilities) {
   const pool = document.getElementById('spellPool'); if (!pool) return;
   pool.innerHTML = '';
@@ -223,7 +292,7 @@ function renderSpellPool(abilities) {
   abilities.forEach(function (ability) {
     const div = document.createElement('div'); div.className = 'spell-item'; div.draggable = true; div.tabIndex = 0;
     div.title = (ability.desc || '') + (/\[VERIFICAR/.test((ability.name||'')+' '+(ability.desc||'')) ? '' : '');
-    const img = document.createElement('img'); img.alt = ability.name || ''; img.src = 'https://wow.zamimg.com/images/wow/icons/small/' + (ability.icon || 'inv_misc_questionmark') + '.jpg';
+    const img = document.createElement('img'); img.alt = ability.name || ''; img.src = DataService ? DataService.iconUrl(ability.icon) : ('https://wow.zamimg.com/images/wow/icons/small/' + (ability.icon || 'inv_misc_questionmark') + '.jpg');
     iconFallbackImg(img, ability.icon || 'inv_misc_questionmark');
     const span = document.createElement('span'); span.textContent = ability.name || ability.nameEn || '?';
     if (/\[VERIFICAR/.test(ability.name || '')) span.title = 'Dato no verificado para Forever';
@@ -260,7 +329,7 @@ function renderSequence() {
   sequence.forEach(function (item, index) {
     const slot = document.createElement('div'); slot.className = 'sequence-slot'; slot.draggable = true; slot.tabIndex = 0;
     const idx = document.createElement('span'); idx.className = 'slot-index'; idx.textContent = (index + 1) + '.';
-    const img = document.createElement('img'); img.alt = item.name || ''; img.src = 'https://wow.zamimg.com/images/wow/icons/small/' + (item.icon || 'inv_misc_questionmark') + '.jpg'; iconFallbackImg(img, item.icon || 'inv_misc_questionmark');
+    const img = document.createElement('img'); img.alt = item.name || ''; img.src = DataService ? DataService.iconUrl(item.icon) : ('https://wow.zamimg.com/images/wow/icons/small/' + (item.icon || 'inv_misc_questionmark') + '.jpg'); iconFallbackImg(img, item.icon || 'inv_misc_questionmark');
     const name = document.createElement('span'); name.textContent = spellDisplayName(item, macroLang) || item.name || ''; name.style.fontSize = '13px';
     const removeBtn = document.createElement('button'); removeBtn.className = 'remove-btn'; removeBtn.type = 'button'; removeBtn.textContent = '✕'; removeBtn.title = 'Quitar';
     removeBtn.onclick = function (ev) { ev.stopPropagation(); sequence.splice(index, 1); renderSequence(); persistState(); };
@@ -349,10 +418,8 @@ function getSafeMacroText() {
     const cut = raw.indexOf('\n# Advertencias:');
     text = (cut !== -1 ? raw.slice(0, cut) : raw);
   }
-  // Defensa final: solo líneas de macro/comandos, sin bloque advertencias
   const cut2 = text.indexOf('\n# Advertencias:'); if (cut2 !== -1) text = text.slice(0, cut2);
   text = text.replace(/\n# Advertencias:[\s\S]*$/m, '').trimEnd();
-  // No copiar el placeholder de error
   if (/^⚠️/.test(text)) return '';
   return text;
 }
@@ -390,7 +457,6 @@ function initMacroUI() {
   updateOptions();
   updateSpellPool();
   renderSequence();
-  // apply cancelaura row after options
   toggleCancelauraRow();
   ['modShift','modCtrl','modAlt'].forEach(function (id) { const e = document.getElementById(id); if (e) e.addEventListener('change', persistState); });
   const ca = document.getElementById('cancelauraName'); if (ca) ca.addEventListener('input', persistState);
