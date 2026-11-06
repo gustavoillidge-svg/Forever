@@ -1,4 +1,4 @@
-const CACHE_NAME = 'wow-forever-tool-v1';
+﻿const CACHE_NAME = 'wow-forever-tool-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -7,9 +7,7 @@ const ASSETS = [
   './js/macros.js',
   './js/talents.js',
   './js/app.js',
-  './manifest.json',
-  './icons/icon-192.png',
-  './icons/icon-512.png'
+  './manifest.json','./icons/icon-192.png','./icons/icon-512.png','./assets/logo.png'
 ];
 
 self.addEventListener('install', event => {
@@ -41,4 +39,5 @@ self.addEventListener('fetch', event => {
     })
   );
 });
+
 

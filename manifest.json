@@ -1,13 +1,21 @@
-﻿{
-  "name": "WoW Forever - Herramienta de Macros y Talentos",
-  "short_name": "WoW Forever Tool",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "background_color": "#0a0e14",
-  "theme_color": "#0a0e14",
-  "description": "Generador de macros y simulador de talentos para WoW Forever. Datos comunitarios no oficiales.",
-  "icons": [
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
-  ]
+{
+    "name":  "WoW Forever — Generador de Macros",
+    "short_name":  "Macros Forever",
+    "start_url":  "./index.html",
+    "display":  "standalone",
+    "background_color":  "#0B0E14",
+    "theme_color":  "#121721",
+    "description":  "Generador de macros estilo WoW Forever. Datos comunitarios no oficiales.",
+    "icons":  [
+                  {
+                      "src":  "icons/icon-192.png",
+                      "sizes":  "192x192",
+                      "type":  "image/png"
+                  },
+                  {
+                      "src":  "icons/icon-512.png",
+                      "sizes":  "512x512",
+                      "type":  "image/png"
+                  }
+              ]
 }
