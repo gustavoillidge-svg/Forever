@@ -47,3 +47,5 @@ MIT
 
 ---
 Última actualización: noviembre 2026
+
+Versión: 1.0.0
