@@ -1,0 +1,44 @@
+﻿[
+    {
+        "url":  "https://www.wowhead.com/forever",
+        "status":  403,
+        "file":  "",
+        "bytes":  0,
+        "error":  "Error en el servidor remoto: (403) Prohibido."
+    },
+    {
+        "url":  "https://www.wowhead.com/forever/spells",
+        "status":  403,
+        "file":  "",
+        "bytes":  0,
+        "error":  "Error en el servidor remoto: (403) Prohibido."
+    },
+    {
+        "url":  "https://www.wowhead.com/forever/guide/new-race-class-combinations",
+        "status":  403,
+        "file":  "",
+        "bytes":  0,
+        "error":  "Error en el servidor remoto: (403) Prohibido."
+    },
+    {
+        "url":  "https://www.wowhead.com/forever/changes",
+        "status":  403,
+        "file":  "",
+        "bytes":  0,
+        "error":  "Error en el servidor remoto: (403) Prohibido."
+    },
+    {
+        "url":  "https://www.wowhead.com/forever/talent-calc",
+        "status":  403,
+        "file":  "",
+        "bytes":  0,
+        "error":  "Error en el servidor remoto: (403) Prohibido."
+    },
+    {
+        "url":  "https://www.wowhead.com/es/icons",
+        "status":  403,
+        "file":  "",
+        "bytes":  0,
+        "error":  "Error en el servidor remoto: (403) Prohibido."
+    }
+]

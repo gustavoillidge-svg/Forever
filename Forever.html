@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WoW Forever - Herramienta de Macros y Talentos</title>
+<style>
+/* ===== ESTÉTICA GENERAL (basada en worldofwarcraft.blizzard.com) ===== */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Open+Sans:wght@400;600;700&display=swap');
+
+:root {
+  --bg-dark: #0a0e14;
+  --bg-panel: #11161f;
+  --bg-panel-light: #1a212d;
+  --gold: #c9a84c;
+  --gold-bright: #f0d78c;
+  --gold-dark: #8a6d2b;
+  --text-primary: #e8e6e3;
+  --text-muted: #9a9a9a;
+  --border-gold: #4a3f2a;
+  --red: #b33a3a;
+  --blue: #2a5a8a;
+  --green: #2a7a4a;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg-dark);
+  color: var(--text-primary);
+  font-family: 'Open Sans', Arial, sans-serif;
+  min-height: 100vh;
+  background-image: radial-gradient(ellipse at top, #1a1a2e 0%, #0a0e14 70%);
+}
+
+/* Header */
+header {
+  background: linear-gradient(180deg, #1a1a2e 0%, #0f0f18 100%);
+  border-bottom: 3px solid var(--gold-dark);
+  padding: 20px 30px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+}
+
+header .logo {
+  font-family: 'Cinzel', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--gold-bright);
+  text-shadow: 0 0 20px rgba(201,168,76,0.5);
+  letter-spacing: 2px;
+}
+
+header .logo span { color: var(--text-primary); font-weight: 400; }
+
+header .subtitle {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-left: auto;
+  font-style: italic;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  background: var(--bg-panel);
+  border-bottom: 2px solid var(--border-gold);
+  padding: 0 30px;
+}
+
+.tab-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 15px 30px;
+  font-size: 16px;
+  font-family: 'Cinzel', serif;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s;
+  letter-spacing: 1px;
+}
+
+.tab-btn:hover { color: var(--gold-bright); }
+
+.tab-btn.active {
+  color: var(--gold-bright);
+  border-bottom-color: var(--gold);
+  background: linear-gradient(180deg, transparent, rgba(201,168,76,0.1));
+}
+
+/* Contenido de pestañas */
+.tab-content { display: none; padding: 25px 30px; }
+.tab-content.active { display: block; }
+
+/* Panel de configuración */
+.config-panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-gold);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
+}
+
+.config-panel h3 {
+  font-family: 'Cinzel', serif;
+  color: var(--gold);
+  margin-bottom: 15px;
+  font-size: 18px;
+  border-bottom: 1px solid var(--border-gold);
+  padding-bottom: 8px;
+}
+
+.config-row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.config-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.config-group label {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+select, input[type="text"] {
+  background: var(--bg-dark);
+  border: 1px solid var(--border-gold);
+  color: var(--text-primary);
+  padding: 10px 15px;
+  border-radius: 4px;
+  font-size: 14px;
+  min-width: 180px;
+  cursor: pointer;
+}
+
+select:focus, input:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 10px rgba(201,168,76,0.3);
+}
+
+/* Zona de hechizos disponibles */
+.spell-pool {
+  background: var(--bg-dark);
+  border: 1px solid var(--border-gold);
+  border-radius: 6px;
+  min-height: 80px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.spell-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-panel-light);
+  border: 1px solid var(--border-gold);
+  border-radius: 4px;
+  padding: 6px 12px;
+  cursor: grab;
+  transition: all 0.2s;
+  font-size: 13px;
+  user-select: none;
+}
+
+.spell-item:hover {
+  border-color: var(--gold);
+  background: #2a2a3e;
+  transform: translateY(-1px);
+}
+
+.spell-item:active { cursor: grabbing; }
+
+.spell-item img {
+  width: 24px;
+  height: 24px;
+  border-radius: 3px;
+  border: 1px solid #333;
+}
+
+.spell-item.disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Zona de secuencia (drop zone) */
+.sequence-zone {
+  background: var(--bg-dark);
+  border: 2px dashed var(--border-gold);
+  border-radius: 6px;
+  min-height: 120px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+  transition: border-color 0.3s;
+}
+
+.sequence-zone.drag-over {
+  border-color: var(--gold);
+  background: rgba(201,168,76,0.05);
+}
+
+.sequence-slot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-panel-light);
+  border: 1px solid var(--gold-dark);
+  border-radius: 4px;
+  padding: 8px 12px;
+  cursor: grab;
+}
+
+.sequence-slot img { width: 28px; height: 28px; border-radius: 3px; }
+
+.sequence-slot .slot-index {
+  color: var(--gold);
+  font-weight: 700;
+  font-size: 14px;
+  min-width: 20px;
+}
+
+.sequence-slot .remove-btn {
+  margin-left: auto;
+  background: var(--red);
+  border: none;
+  color: white;
+  border-radius: 3px;
+  padding: 3px 8px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.sequence-slot .remove-btn:hover { background: #d44; }
+
+.empty-hint {
+  color: var(--text-muted);
+  font-style: italic;
+  text-align: center;
+  padding: 20px;
+  font-size: 14px;
+}
+
+/* Opciones de macro */
+.macro-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.option-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--bg-panel-light);
+  border: 1px solid #2a2a3e;
+  border-radius: 6px;
+  padding: 12px;
+  cursor: help;
+  position: relative;
+  transition: border-color 0.2s;
+}
+
+.option-item:hover { border-color: var(--gold-dark); }
+
+.option-item input[type="checkbox"] {
+  accent-color: var(--gold);
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  cursor: pointer;
+}
+
+.option-item .option-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.option-item .option-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+
+/* Tooltip personalizado */
+.option-item[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  background: #1a1a2e;
+  border: 1px solid var(--gold);
+  color: var(--text-primary);
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+  width: 280px;
+  z-index: 100;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.9);
+  margin-bottom: 5px;
+  pointer-events: none;
+}
+
+/* Selector de modificadores */
+.modifier-row {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.modifier-row label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--text-primary);
+}
+
+.modifier-row input[type="checkbox"] { accent-color: var(--gold); }
+
+/* Área de resultado */
+.macro-output {
+  background: #0a0a0f;
+  border: 2px solid var(--gold-dark);
+  border-radius: 6px;
+  padding: 15px;
+  margin-top: 15px;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  color: var(--gold-bright);
+  white-space: pre-wrap;
+  word-break: break-all;
+  min-height: 60px;
+  position: relative;
+}
+
+.copy-btn {
+  background: var(--gold-dark);
+  border: 1px solid var(--gold);
+  color: var(--text-primary);
+  padding: 8px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s;
+  margin-top: 10px;
+}
+
+.copy-btn:hover { background: var(--gold); color: #000; }
+
+/* Nota de datos */
+.data-note {
+  background: rgba(179,58,58,0.15);
+  border: 1px solid var(--red);
+  border-radius: 6px;
+  padding: 10px 15px;
+  font-size: 12px;
+  color: #e8a0a0;
+  margin-top: 15px;
+}
+
+/* ===== SIMULADOR DE TALENTOS ===== */
+.talent-container {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.talent-trees {
+  display: flex;
+  gap: 15px;
+  flex: 1;
+  min-width: 600px;
+}
+
+.talent-tree {
+  flex: 1;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-gold);
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.talent-tree h4 {
+  font-family: 'Cinzel', serif;
+  color: var(--gold);
+  text-align: center;
+  margin-bottom: 12px;
+  font-size: 15px;
+  border-bottom: 1px solid var(--border-gold);
+  padding-bottom: 8px;
+}
+
+.talent-row {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.talent-node {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid #333;
+  background: var(--bg-dark);
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  transition: all 0.2s;
+  overflow: hidden;
+}
+
+.talent-node:hover { border-color: var(--gold); transform: scale(1.1); }
+
+.talent-node.rank-1 { border-color: #5a5a2a; background: #2a2a1a; color: var(--gold-bright); }
+.talent-node.rank-2 { border-color: var(--gold); background: #3a3a1a; color: var(--gold-bright); box-shadow: 0 0 10px rgba(201,168,76,0.3); }
+.talent-node.rank-3 { border-color: var(--gold-bright); background: #4a4a1a; color: #fff; box-shadow: 0 0 15px rgba(240,215,140,0.5); }
+.talent-node.locked { opacity: 0.4; cursor: not-allowed; }
+
+.talent-node .rank-badge {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  background: var(--gold-dark);
+  color: #fff;
+  font-size: 9px;
+  padding: 1px 4px;
+  border-radius: 6px;
+  min-width: 16px;
+  text-align: center;
+}
+
+.talent-info-panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-gold);
+  border-radius: 8px;
+  padding: 20px;
+  min-width: 280px;
+  max-width: 350px;
+  box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
+}
+
+.talent-info-panel h4 {
+  font-family: 'Cinzel', serif;
+  color: var(--gold-bright);
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.talent-info-panel .talent-desc {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  margin-bottom: 15px;
+}
+
+.talent-info-panel .talent-benefit {
+  background: rgba(42,122,74,0.15);
+  border-left: 3px solid var(--green);
+  padding: 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #a0e8a0;
+  border-radius: 0 4px 4px 0;
+  margin-bottom: 10px;
+}
+
+.points-remaining {
+  font-family: 'Cinzel', serif;
+  font-size: 20px;
+  color: var(--gold-bright);
+  text-align: center;
+  padding: 10px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-gold);
+  border-radius: 6px;
+  margin-bottom: 15px;
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-dark); }
+::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .talent-trees { flex-direction: column; min-width: auto; }
+  .config-row { flex-direction: column; align-items: stretch; }
+  select, input[type="text"] { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">WOW <span>FOREVER</span></div>
+  <div class="subtitle">Herramienta comunitaria de Macros y Talentos · Datos no oficiales</div>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('macros')">⚔️ Generador de Macros</button>
+  <button class="tab-btn" onclick="switchTab('talents')">📜 Simulador de Talentos</button>
+</div>
+
+<!-- ==================== PESTAÑA: GENERADOR DE MACROS ==================== -->
+<div id="tab-macros" class="tab-content active">
+
+  <div class="config-panel">
+    <h3>⚙️ Configuración del Personaje</h3>
+    <div class="config-row">
+      <div class="config-group">
+        <label>Clase</label>
+        <select id="classSelect" onchange="onClassChange()">
+          <option value="">— Selecciona clase —</option>
+        </select>
+      </div>
+      <div class="config-group">
+        <label>Raza</label>
+        <select id="raceSelect" onchange="onRaceChange()">
+          <option value="">— Selecciona raza —</option>
+        </select>
+      </div>
+      <div class="config-group">
+        <label>Nivel (1-60)</label>
+        <input type="number" id="levelInput" min="1" max="60" value="60" onchange="onLevelChange()" style="min-width:100px;">
+      </div>
+    </div>
+    <div class="data-note">
+      ⚠️ Datos comunitarios basados en WoW Classic / Forever. Los nombres de hechizos y niveles de aprendizaje pueden variar. 
+      Esta herramienta no está afiliada a Blizzard Entertainment.
+    </div>
+  </div>
+
+  <div class="config-panel">
+    <h3>✨ Hechizos Disponibles (arrastra a la secuencia)</h3>
+    <div class="spell-pool" id="spellPool">
+      <div class="empty-hint">Selecciona clase y raza para ver los hechizos disponibles.</div>
+    </div>
+  </div>
+
+  <div class="config-panel">
+    <h3>📋 Secuencia de Macro (suelta aquí)</h3>
+    <div class="sequence-zone" id="sequenceZone" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
+      <div class="empty-hint">Arrastra hechizos aquí para construir tu macro.<br>El orden importa: el primero se ejecutará primero.</div>
+    </div>
+  </div>
+
+  <div class="config-panel">
+    <h3>🔧 Opciones de Comportamiento</h3>
+    <div class="macro-options" id="macroOptions">
+      <!-- Se genera dinámicamente con JS -->
+    </div>
+
+    <div style="margin-top:15px;">
+      <label style="font-size:13px; color:var(--text-muted);">Modificadores de teclado (añaden ramas condicionales):</label>
+      <div class="modifier-row">
+        <label><input type="checkbox" id="modShift"> Shift</label>
+        <label><input type="checkbox" id="modCtrl"> Ctrl</label>
+        <label><input type="checkbox" id="modAlt"> Alt</label>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex; gap:15px; align-items:center; flex-wrap:wrap;">
+    <button class="copy-btn" onclick="generateMacro()" style="font-size:16px; padding:12px 30px;">⚡ Generar Macro</button>
+    <button class="copy-btn" onclick="copyMacro()" id="copyBtn" style="display:none;">📋 Copiar al portapapeles</button>
+  </div>
+
+  <div class="macro-output" id="macroOutput">Aquí aparecerá tu macro generada...</div>
+
+</div>
+
+<!-- ==================== PESTAÑA: SIMULADOR DE TALENTOS ==================== -->
+<div id="tab-talents" class="tab-content">
+
+  <div class="config-panel">
+    <h3>⚙️ Configuración de Talentos</h3>
+    <div class="config-row">
+      <div class="config-group">
+        <label>Clase</label>
+        <select id="talentClassSelect" onchange="onTalentClassChange()">
+          <option value="">— Selecciona clase —</option>
+        </select>
+      </div>
+      <div class="config-group">
+        <label>Nivel (10-60)</label>
+        <input type="number" id="talentLevelInput" min="10" max="60" value="60" onchange="onTalentLevelChange()" style="min-width:100px;">
+      </div>
+    </div>
+    <div class="points-remaining" id="pointsRemaining">Puntos disponibles: 51</div>
+    <div class="data-note">
+      ⚠️ Los árboles de talentos son una representación simplificada basada en datos comunitarios de WoW Forever. 
+      No reflejan necesariamente el estado final del servidor. Las descripciones son orientativas.
+    </div>
+  </div>
+
+  <div class="talent-container">
+    <div class="talent-trees" id="talentTrees">
+      <div class="empty-hint" style="width:100%;">Selecciona una clase para ver sus talentos.</div>
+    </div>
+    <div class="talent-info-panel" id="talentInfoPanel">
+      <h4>Información del Talento</h4>
+      <div class="talent-desc">Pasa el mouse sobre un talento para ver su descripción y lo que aporta.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ==================== DATOS EMBEBIDOS ====================
+
+// Iconos base (usando Wowhead CDN con IDs de hechizos conocidos)
+// Para producción, idealmente usar nombres de iconos exactos. Aquí usamos IDs de hechizos clásicos.
+
+const CLASSES = {
+  warrior: { name: 'Guerrero', nameEn: 'Warrior', color: '#C79C6E', icon: 'ability_warrior_savageblow' },
+  paladin: { name: 'Paladín', nameEn: 'Paladin', color: '#F58CBA', icon: 'ability_paladin_blessedmending' },
+  hunter: { name: 'Cazador', nameEn: 'Hunter', color: '#ABD473', icon: 'ability_hunter_swiftstrike' },
+  rogue: { name: 'Pícaro', nameEn: 'Rogue', color: '#FFF569', icon: 'ability_rogue_eviscerate' },
+  priest: { name: 'Sacerdote', nameEn: 'Priest', color: '#FFFFFF', icon: 'spell_holy_wordfortitude' },
+  shaman: { name: 'Chamán', nameEn: 'Shaman', color: '#0070DE', icon: 'spell_nature_lightningbolt' },
+  mage: { name: 'Mago', nameEn: 'Mage', color: '#69CCF0', icon: 'spell_fire_fireball' },
+  warlock: { name: 'Brujo', nameEn: 'Warlock', color: '#9482C9', icon: 'spell_shadow_shadowbolt' },
+  druid: { name: 'Druida', nameEn: 'Druid', color: '#FF7D0A', icon: 'ability_druid_ferociousbite' }
+};
+
+const RACES = {
+  human: { name: 'Humano', nameEn: 'Human', faction: 'alliance', icon: 'achievement_character_human_male' },
+  dwarf: { name: 'Enano', nameEn: 'Dwarf', faction: 'alliance', icon: 'achievement_character_dwarf_male' },
+  nightelf: { name: 'Elfo de la Noche', nameEn: 'Night Elf', faction: 'alliance', icon: 'achievement_character_nightelf_male' },
+  gnome: { name: 'Gnomo', nameEn: 'Gnome', faction: 'alliance', icon: 'achievement_character_gnome_male' },
+  orc: { name: 'Orco', nameEn: 'Orc', faction: 'horde', icon: 'achievement_character_orc_male' },
+  undead: { name: 'No-Muerto', nameEn: 'Undead', faction: 'horde', icon: 'achievement_character_undead_male' },
+  tauren: { name: 'Tauren', nameEn: 'Tauren', faction: 'horde', icon: 'achievement_character_tauren_male' },
+  troll: { name: 'Trol', nameEn: 'Troll', faction: 'horde', icon: 'achievement_character_troll_male' }
+};
+
+// Raciales (habilidades activas que se pueden usar en macros)
+const RACIALS = {
+  human: [
+    { name: 'Percepción', nameEn: 'Perception', level: 1, icon: 'spell_nature_abolishmagic', desc: 'Aumenta la detección de sigilo.' },
+    { name: 'Voluntad de los Renegados', nameEn: 'Will to Survive', level: 1, icon: 'spell_holy_sealofvalor', desc: 'Elimina efectos de control.' },
+    { name: 'Especialización en Espadas', nameEn: 'Sword Specialization', level: 1, icon: 'ability_meleedamage', desc: 'Pasiva: +2% crítico con espadas.' },
+    { name: 'Espíritu Humano', nameEn: 'The Human Spirit', level: 1, icon: 'spell_holy_holyprotection', desc: 'Pasiva: +5% espíritu.' }
+  ],
+  dwarf: [
+    { name: 'Forma de Piedra', nameEn: 'Stoneform', level: 1, icon: 'spell_shadow_unholystrength', desc: 'Inmunidad a sangrado, veneno y enfermedad.' },
+    { name: 'Especialización en Mazas', nameEn: 'Mace Specialization', level: 1, icon: 'inv_mace_01', desc: 'Pasiva: +1% daño con mazas.' },
+    { name: 'Cazador de Bestias', nameEn: 'Big Game Hunter', level: 1, icon: 'ability_hunter_snipershot', desc: 'Pasiva: +5% daño a bestias.' },
+    { name: 'Encontrar Tesoro', nameEn: 'Find Treasure', level: 1, icon: 'spell_nature_magicimmunity', desc: 'Detecta cofres cercanos.' }
+  ],
+  nightelf: [
+    { name: 'Luz de Elune', nameEn: "Elune's Light", level: 1, icon: 'spell_holy_moonfire', desc: '+10% crítico durante 15s.' },
+    { name: 'Fusión con las Sombras', nameEn: 'Shadowmeld', level: 1, icon: 'ability_stealth', desc: 'Sigilo mientras está quieto.' },
+    { name: 'Rapidez', nameEn: 'Quickness', level: 1, icon: 'ability_rogue_sprint', desc: 'Pasiva: +1% esquiva, +2% velocidad.' },
+    { name: 'Espíritu de Fuego Fatuo', nameEn: 'Wisp Spirit', level: 1, icon: 'spell_nature_wispsplode', desc: 'Pasiva: velocidad en forma de fuego fatuo.' }
+  ],
+  gnome: [
+    { name: 'Escapista', nameEn: 'Escape Artist', level: 1, icon: 'ability_rogue_sprint', desc: 'Libera de inmovilización y ralentización.' },
+    { name: '¡Eureka!', nameEn: 'Eureka!', level: 1, icon: 'spell_arcane_arcane01', desc: 'Reduce costos y +10% daño/curación en 3 habilidades.' },
+    { name: 'Mente Expansiva', nameEn: 'Expansive Mind', level: 1, icon: 'spell_arcane_arcane03', desc: 'Pasiva: +5% maná/ira/energía.' },
+    { name: 'Especialización en Ingeniería', nameEn: 'Engineering Specialization', level: 1, icon: 'trade_engineering', desc: 'Pasiva: +15 habilidad ingeniería.' }
+  ],
+  orc: [
+    { name: 'Furia Sangrienta', nameEn: 'Blood Fury', level: 1, icon: 'spell_shadow_bloodboil', desc: '+10% ataque y hechizos durante 15s.' },
+    { name: 'Romper Maldición', nameEn: 'Shatter Curse', level: 1, icon: 'spell_shadow_antimagicshell', desc: 'Inmunidad a maldiciones 8s.' },
+    { name: 'Especialización en Hachas', nameEn: 'Axe Specialization', level: 1, icon: 'inv_axe_01', desc: 'Pasiva: +1% crítico con hachas.' },
+    { name: 'Dureza', nameEn: 'Hardiness', level: 1, icon: 'spell_nature_stoneclawtotem', desc: 'Pasiva: -20% duración de aturdimiento.' }
+  ],
+  undead: [
+    { name: 'Toque de la Tumba', nameEn: 'Touch of the Grave', level: 1, icon: 'spell_shadow_lifedrain', desc: 'Roba vida con ataques.' },
+    { name: 'Voluntad de los Renegados', nameEn: 'Will of the Forsaken', level: 1, icon: 'spell_shadow_raiseundead', desc: 'Libera de encanto, miedo y sueño.' },
+    { name: 'Canibalismo', nameEn: 'Cannibalize', level: 1, icon: 'ability_creature_cursed_02', desc: 'Come cadáveres para curar.' },
+    { name: 'Respiración Subacuática', nameEn: 'Underwater Breathing', level: 1, icon: 'spell_shadow_demonbreath', desc: 'Pasiva: respiración prolongada.' }
+  ],
+  tauren: [
+    { name: 'Carrera de la Llanura', nameEn: 'Plainsrunning', level: 1, icon: 'ability_racial_plainsrunning', desc: 'Velocidad aumenta con el tiempo corriendo.' },
+    { name: 'Cultivo', nameEn: 'Cultivation', level: 1, icon: 'spell_nature_naturetouchgrow', desc: 'Recolecta hierbas adicionales.' },
+    { name: 'Aguante', nameEn: 'Endurance', level: 1, icon: 'spell_nature_reincarnation', desc: 'Pasiva: +5% vida, +1% golpe.' },
+    { name: 'Pisotón de Guerra', nameEn: 'War Stomp', level: 1, icon: 'ability_warstomp', desc: 'Aturde enemigos cercanos 2s.' }
+  ],
+  troll: [
+    { name: 'Berserker', nameEn: 'Berserking', level: 1, icon: 'racial_troll_berserk', desc: '+10-30% velocidad de ataque según vida.' },
+    { name: 'Regeneración', nameEn: 'Regeneration', level: 1, icon: 'spell_nature_regeneration', desc: 'Pasiva: +10% regeneración de vida.' },
+    { name: 'Lanzador de Hachas', nameEn: 'Throwing Specialization', level: 1, icon: 'inv_weapon_halberd_04', desc: 'Pasiva: +1% crítico con armas arrojadizas.' },
+    { name: 'Matar Bestias', nameEn: 'Beast Slaying', level: 1, icon: 'ability_hunter_snipershot', desc: 'Pasiva: +5% daño a bestias.' }
+  ]
+};
+
+// Hechizos por clase (basado en WoW Classic/Forever, nivel de aprendizaje)
+// Nota: Lista simplificada de habilidades activas relevantes para macros.
+// Los niveles son aproximados según datos comunitarios.
+const SPELLS = {
+  warrior: [
+    { name: 'Carga', nameEn: 'Charge', level: 4, icon: 'ability_warrior_charge' },
+    { name: 'Golpe Heroico', nameEn: 'Heroic Strike', level: 1, icon: 'ability_rogue_heroicstrike' },
+    { name: 'Grito de Batalla', nameEn: 'Battle Shout', level: 2, icon: 'ability_warrior_battleshout' },
+    { name: 'Rendir', nameEn: 'Rend', level: 4, icon: 'ability_gouge' },
+    { name: 'Torbellino', nameEn: 'Whirlwind', level: 36, icon: 'ability_whirlwind' },
+    { name: 'Golpe Mortal', nameEn: 'Mortal Strike', level: 40, icon: 'ability_warrior_savageblow' },
+    { name: 'Ejecutar', nameEn: 'Execute', level: 24, icon: 'inv_sword_48' },
+    { name: 'Provocar', nameEn: 'Taunt', level: 10, icon: 'spell_nature_reincarnation' },
+    { name: 'Escudo en Bloque', nameEn: 'Shield Block', level: 16, icon: 'ability_defend' },
+    { name: 'Muro de Escudo', nameEn: 'Shield Wall', level: 28, icon: 'ability_warrior_shieldwall' },
+    { name: 'Represalias', nameEn: 'Retaliation', level: 20, icon: 'ability_warrior_challange' },
+    { name: 'Grito de Intimidación', nameEn: 'Intimidating Shout', level: 22, icon: 'ability_groan' },
+    { name: 'Interceptar', nameEn: 'Intercept', level: 30, icon: 'ability_warrior_victoryrush' },
+    { name: 'Masa Crítica', nameEn: 'Cleave', level: 20, icon: 'ability_warrior_cleave' },
+    { name: 'Desgarrar Armadura', nameEn: 'Sunder Armor', level: 10, icon: 'ability_warrior_sunderarmor' },
+    { name: 'Romper Armadura', nameEn: 'Sunder Armor', level: 10, icon: 'ability_warrior_sunderarmor' },
+    { name: 'Golpe de Escudo', nameEn: 'Shield Slam', level: 40, icon: 'inv_shield_05' },
+    { name: 'Venganza', nameEn: 'Revenge', level: 14, icon: 'ability_warrior_revenge' },
+    { name: 'Bloquear Escudo', nameEn: 'Shield Block', level: 16, icon: 'ability_defend' },
+    { name: 'Rabia', nameEn: 'Berserker Rage', level: 32, icon: 'spell_nature_ancestralguardian' },
+    { name: 'Sed de Sangre', nameEn: 'Bloodthirst', level: 40, icon: 'spell_nature_bloodlust' }
+  ],
+  paladin: [
+    { name: 'Luz Sagrada', nameEn: 'Holy Light', level: 1, icon: 'spell_holy_holybolt' },
+    { name: 'Fuego Sagrado', nameEn: 'Holy Fire', level: 20, icon: 'spell_holy_searinglight' },
+    { name: 'Consagración', nameEn: 'Consecration', level: 20, icon: 'spell_holy_innerfire' },
+    { name: 'Sello del Poder', nameEn: 'Seal of Power', level: 22, icon: 'spell_holy_sealofmight' },
+    { name: 'Sello de la Luz', nameEn: 'Seal of Light', level: 30, icon: 'spell_holy_healingaura' },
+    { name: 'Juicio', nameEn: 'Judgement', level: 4, icon: 'spell_holy_judgement' },
+    { name: 'Bendición de Poder', nameEn: 'Blessing of Might', level: 4, icon: 'spell_holy_greaterblessingofkings' },
+    { name: 'Bendición de Sabiduría', nameEn: 'Blessing of Wisdom', level: 14, icon: 'spell_holy_sealofwisdom' },
+    { name: 'Escudo Divino', nameEn: 'Divine Shield', level: 34, icon: 'spell_holy_divineshield' },
+    { name: 'Protección Divina', nameEn: 'Divine Protection', level: 6, icon: 'spell_holy_restoration' },
+    { name: 'Sanación', nameEn: 'Flash of Light', level: 20, icon: 'spell_holy_flashheal' },
+    { name: 'Exorcismo', nameEn: 'Exorcism', level: 20, icon: 'spell_holy_excorcism_02' },
+    { name: 'Reprensión', nameEn: 'Hammer of Wrath', level: 44, icon: 'ability_thunderclap' },
+    { name: 'Golpe de Cruzado', nameEn: 'Crusader Strike', level: 50, icon: 'spell_holy_crusaderstrike' },
+    { name: 'Aura de Devoción', nameEn: 'Devotion Aura', level: 1, icon: 'spell_holy_devotionaura' },
+    { name: 'Aura de Retribución', nameEn: 'Retribution Aura', level: 16, icon: 'spell_holy_auraoflight' },
+    { name: 'Imposición de Manos', nameEn: 'Lay on Hands', level: 10, icon: 'spell_holy_layonhands' },
+    { name: 'Bendición de Protección', nameEn: 'Blessing of Protection', level: 10, icon: 'spell_holy_sealofprotection' },
+    { name: 'Bendición de Libertad', nameEn: 'Blessing of Freedom', level: 18, icon: 'spell_holy_sealofvalor' }
+  ],
+  hunter: [
+    { name: 'Disparo Arcano', nameEn: 'Arcane Shot', level: 6, icon: 'spell_arcane_arcaneshot' },
+    { name: 'Disparo Serpiente', nameEn: 'Serpent Sting', level: 4, icon: 'ability_hunter_quickshot' },
+    { name: 'Marca del Cazador', nameEn: "Hunter's Mark", level: 1, icon: 'ability_hunter_snipershot' },
+    { name: 'Flecha de Fuego', nameEn: 'Fire Shot', level: 20, icon: 'spell_fire_firearrow' },
+    { name: 'Disparo Múltiple', nameEn: 'Multi-Shot', level: 18, icon: 'ability_upgrademoonglaive' },
+    { name: 'Picadura de Escorpión', nameEn: 'Scorpid Sting', level: 22, icon: 'ability_hunter_criticalshot' },
+    { name: 'Disparo de Puntería', nameEn: 'Aimed Shot', level: 20, icon: 'inv_spear_07' },
+    { name: 'Trampa Helada', nameEn: 'Frost Trap', level: 28, icon: 'spell_frost_freezingbreath' },
+    { name: 'Trampa Explosiva', nameEn: 'Explosive Trap', level: 34, icon: 'spell_fire_selfdestruct' },
+    { name: 'Trampa de Fuego', nameEn: 'Immolation Trap', level: 16, icon: 'spell_fire_immolation' },
+    { name: 'Aspecto del Halcón', nameEn: 'Aspect of the Hawk', level: 4, icon: 'spell_nature_ravenform' },
+    { name: 'Aspecto del Guepardo', nameEn: 'Aspect of the Cheetah', level: 20, icon: 'ability_mount_jungletiger' },
+    { name: 'Aspecto del Mono', nameEn: 'Aspect of the Monkey', level: 14, icon: 'ability_hunter_aspectofthemonkey' },
+    { name: 'Aspecto de la Bestia', nameEn: 'Aspect of the Beast', level: 30, icon: 'ability_mount_pinktiger' },
+    { name: 'Fingir Muerte', nameEn: 'Feign Death', level: 30, icon: 'ability_rogue_feigndeath' },
+    { name: 'Ahuyentar', nameEn: 'Scare Beast', level: 14, icon: 'ability_druid_cower' },
+    { name: 'Congelar Flecha', nameEn: 'Freezing Arrow', level: 40, icon: 'spell_frost_chainsofice' },
+    { name: 'Disparo de Ráfaga', nameEn: 'Burst Shot', level: 40, icon: 'ability_hunter_rapidkilling' }
+  ],
+  rogue: [
+    { name: 'Puñalada', nameEn: 'Sinister Strike', level: 1, icon: 'spell_shadow_ritualofsacrifice' },
+    { name: 'Eviscerar', nameEn: 'Eviscerate', level: 1, icon: 'ability_rogue_eviscerate' },
+    { name: 'Golpe Bajo', nameEn: 'Cheap Shot', level: 4, icon: 'ability_cheapshot' },
+    { name: 'Desgarrar', nameEn: 'Rupture', level: 10, icon: 'ability_rogue_rupture' },
+    { name: 'Golpe en la Espalda', nameEn: 'Backstab', level: 4, icon: 'ability_backstab' },
+    { name: 'Amago', nameEn: 'Feint', level: 6, icon: 'ability_rogue_feint' },
+    { name: 'Evocación', nameEn: 'Evasion', level: 8, icon: 'spell_shadow_shadowward' },
+    { name: 'Sprint', nameEn: 'Sprint', level: 10, icon: 'ability_rogue_sprint' },
+    { name: 'Kick', nameEn: 'Kick', level: 12, icon: 'ability_kick' },
+    { name: 'Veneno de Heridas', nameEn: 'Wound Poison', level: 14, icon: 'inv_misc_herb_16' },
+    { name: 'Desarmar', nameEn: 'Disarm Trap', level: 16, icon: 'spell_shadow_teleport' },
+    { name: 'Sangrado', nameEn: 'Gouge', level: 6, icon: 'ability_gouge' },
+    { name: 'Vanish', nameEn: 'Vanish', level: 22, icon: 'ability_vanish' },
+    { name: 'Ceguera', nameEn: 'Blind', level: 24, icon: 'spell_shadow_mindsteal' },
+    { name: 'Veneno de Mente', nameEn: 'Mind-numbing Poison', level: 24, icon: 'spell_nature_nullifydisease' },
+    { name: 'Abrumar', nameEn: 'Kidney Shot', level: 26, icon: 'ability_rogue_kidneyshot' },
+    { name: 'Veneno Crippling', nameEn: 'Crippling Poison', level: 20, icon: 'ability_poisonsting' },
+    { name: 'Cold Blood', nameEn: 'Cold Blood', level: 30, icon: 'spell_ice_lament' },
+    { name: 'Preparación', nameEn: 'Preparation', level: 30, icon: 'spell_shadow_antishadow' },
+    { name: 'Adrenaline Rush', nameEn: 'Adrenaline Rush', level: 40, icon: 'spell_shadow_shadowworddominate' }
+  ],
+  priest: [
+    { name: 'Palabra de Poder: Escudo', nameEn: 'Power Word: Shield', level: 6, icon: 'spell_holy_powerwordshield' },
+    { name: 'Renovar', nameEn: 'Renew', level: 8, icon: 'spell_holy_renew' },
+    { name: 'Curación Menor', nameEn: 'Lesser Heal', level: 1, icon: 'spell_holy_lesserheal' },
+    { name: 'Curación', nameEn: 'Heal', level: 16, icon: 'spell_holy_heal' },
+    { name: 'Rezo de Curación', nameEn: 'Prayer of Healing', level: 30, icon: 'spell_holy_prayerofhealing02' },
+    { name: 'Palabra Sagrada: Castigo', nameEn: 'Holy Word: Chastise', level: 1, icon: 'spell_holy_chastise' },
+    { name: 'Castigo', nameEn: 'Smite', level: 1, icon: 'spell_holy_holysmite' },
+    { name: 'Palabra de las Sombras: Dolor', nameEn: 'Shadow Word: Pain', level: 4, icon: 'spell_shadow_shadowwordpain' },
+    { name: 'Explosión Mental', nameEn: 'Mind Blast', level: 4, icon: 'spell_shadow_unholyfrenzy' },
+    { name: 'Control Mental', nameEn: 'Mind Control', level: 30, icon: 'spell_shadow_shadowworddominate' },
+    { name: 'Disipar Magia', nameEn: 'Dispel Magic', level: 20, icon: 'spell_holy_dispelmagic' },
+    { name: 'Purificar', nameEn: 'Purify', level: 20, icon: 'spell_holy_purify' },
+    { name: 'Miedo', nameEn: 'Psychic Scream', level: 14, icon: 'spell_shadow_psychicscream' },
+    { name: 'Fuego Sagrado', nameEn: 'Holy Fire', level: 20, icon: 'spell_holy_searinglight' },
+    { name: 'Forma de las Sombras', nameEn: 'Shadowform', level: 40, icon: 'spell_shadow_shadowform' },
+    { name: 'Palabra de Poder: Fortaleza', nameEn: 'Power Word: Fortitude', level: 1, icon: 'spell_holy_wordfortitude' },
+    { name: 'Palabra de Poder: Entereza', nameEn: 'Power Word: Fortitude', level: 1, icon: 'spell_holy_wordfortitude' },
+    { name: 'Rezo de Curación', nameEn: 'Prayer of Healing', level: 30, icon: 'spell_holy_prayerofhealing' },
+    { name: 'Nova Sagrada', nameEn: 'Holy Nova', level: 40, icon: 'spell_holy_holynova' },
+    { name: 'Aliento de la Naturaleza', nameEn: 'Inner Fire', level: 12, icon: 'spell_holy_innerfire' }
+  ],
+  shaman: [
+    { name: 'Relámpago', nameEn: 'Lightning Bolt', level: 1, icon: 'spell_nature_lightningbolt' },
+    { name: 'Choque de Tierra', nameEn: 'Earth Shock', level: 4, icon: 'spell_nature_earthshock' },
+    { name: 'Choque de Fuego', nameEn: 'Flame Shock', level: 10, icon: 'spell_fire_flameshock' },
+    { name: 'Choque de Escarcha', nameEn: 'Frost Shock', level: 20, icon: 'spell_frost_frostshock' },
+    { name: 'Rayo', nameEn: 'Chain Lightning', level: 32, icon: 'spell_nature_chainlightning' },
+    { name: 'Curación', nameEn: 'Healing Wave', level: 1, icon: 'spell_nature_healingwavegreater' },
+    { name: 'Curación Menor', nameEn: 'Lesser Healing Wave', level: 20, icon: 'spell_nature_healingwavelesser' },
+    { name: 'Escudo de Relámpago', nameEn: 'Lightning Shield', level: 8, icon: 'spell_nature_lightningshield' },
+    { name: 'Arma de Fuego', nameEn: 'Flametongue Weapon', level: 10, icon: 'spell_fire_flametongue' },
+    { name: 'Arma de Escarcha', nameEn: 'Frostbrand Weapon', level: 20, icon: 'spell_frost_frostbrand' },
+    { name: 'Arma de Viento', nameEn: 'Windfury Weapon', level: 30, icon: 'spell_nature_cyclone' },
+    { name: 'Tótem de Fuerza de Tierra', nameEn: 'Strength of Earth Totem', level: 10, icon: 'spell_nature_earthbindtotem' },
+    { name: 'Tótem de Piel de Piedra', nameEn: 'Stoneskin Totem', level: 4, icon: 'spell_nature_stoneskintotem' },
+    { name: 'Tótem de Sanación', nameEn: 'Healing Stream Totem', level: 20, icon: 'inv_spear_04' },
+    { name: 'Tótem de Maná', nameEn: 'Mana Spring Totem', level: 26, icon: 'spell_nature_manaregentotem' },
+    { name: 'Tótem de Cólera', nameEn: 'Searing Totem', level: 10, icon: 'spell_fire_searingtotem' },
+    { name: 'Tótem de Magma', nameEn: 'Magma Totem', level: 26, icon: 'spell_fire_selfdestruct' },
+    { name: 'Tótem de Temblor', nameEn: 'Tremor Totem', level: 18, icon: 'spell_nature_tremortotem' },
+    { name: 'Tótem de Limpieza', nameEn: 'Cleansing Totem', level: 38, icon: 'spell_nature_diseasecleansingtotem' },
+    { name: 'Tótem de Resistencia al Fuego', nameEn: 'Fire Resistance Totem', level: 24, icon: 'spell_fire_resistfire' },
+    { name: 'Tótem de Resistencia a la Escarcha', nameEn: 'Frost Resistance Totem', level: 26, icon: 'spell_frost_resistfrost' },
+    { name: 'Tótem de Gracia del Viento', nameEn: 'Grace of Air Totem', level: 42, icon: 'spell_nature_invisibilitytotem' },
+    { name: 'Tótem de Cólera de Viento', nameEn: 'Windfury Totem', level: 30, icon: 'spell_nature_windfury' },
+    { name: 'Tótem de Garra de Piedra', nameEn: 'Stoneclaw Totem', level: 8, icon: 'spell_nature_stoneclawtotem' },
+    { name: 'Tótem de Fuerza de Voluntad', nameEn: 'Grounding Totem', level: 30, icon: 'spell_nature_groundingtotem' },
+    { name: 'Tótem de Marea de Maná', nameEn: 'Mana Tide Totem', level: 40, icon: 'spell_frost_summonwaterelemental' },
+    { name: 'Tótem de Cólera de Fuego', nameEn: 'Wrath of Air Totem', level: 44, icon: 'spell_nature_slowingtotem' },
+    { name: 'Tótem de Furia de Sangre', nameEn: 'Bloodlust', level: 50, icon: 'spell_nature_bloodlust' },
+    { name: 'Tótem de Sanación en Cadena', nameEn: 'Chain Heal', level: 40, icon: 'spell_nature_healingwavegreater' },
+    { name: 'Forma de Lobo Espectral', nameEn: 'Ghost Wolf', level: 20, icon: 'spell_nature_spiritwolf' }
+  ],
+  mage: [
+    { name: 'Bola de Fuego', nameEn: 'Fireball', level: 1, icon: 'spell_fire_fireball' },
+    { name: 'Escarcha', nameEn: 'Frostbolt', level: 4, icon: 'spell_frost_frostbolt02' },
+    { name: 'Proyectil Arcano', nameEn: 'Arcane Missiles', level: 8, icon: 'spell_nature_starfall' },
+    { name: 'Explosión Arcana', nameEn: 'Arcane Explosion', level: 14, icon: 'spell_nature_wispsplode' },
+    { name: 'Nova de Escarcha', nameEn: 'Frost Nova', level: 10, icon: 'spell_frost_frostnova' },
+    { name: 'Cono de Frío', nameEn: 'Cone of Cold', level: 26, icon: 'spell_frost_glacier' },
+    { name: 'Blizzard', nameEn: 'Blizzard', level: 20, icon: 'spell_frost_icestorm' },
+    { name: 'Lluvia de Fuego', nameEn: 'Rain of Fire', level: 20, icon: 'spell_shadow_rainoffire' },
+    { name: 'Piroexplosión', nameEn: 'Pyroblast', level: 20, icon: 'spell_fire_fireball02' },
+    { name: 'Escudo de Hielo', nameEn: 'Ice Barrier', level: 40, icon: 'spell_ice_lament' },
+    { name: 'Bloque de Hielo', nameEn: 'Ice Block', level: 30, icon: 'spell_frost_frost' },
+    { name: 'Intelecto Arcano', nameEn: 'Arcane Intellect', level: 1, icon: 'spell_holy_magicalsentry' },
+    { name: 'Armadura de Escarcha', nameEn: 'Frost Armor', level: 1, icon: 'spell_frost_frostarmor02' },
+    { name: 'Armadura de Magma', nameEn: 'Molten Armor', level: 30, icon: 'spell_fire_firearmor' },
+    { name: 'Armadura de Hielo', nameEn: 'Ice Armor', level: 30, icon: 'spell_frost_frostarmor' },
+    { name: 'Polimorfia', nameEn: 'Polymorph', level: 8, icon: 'spell_nature_polymorph' },
+    { name: 'Contrahechizo', nameEn: 'Counterspell', level: 24, icon: 'spell_frost_iceshock' },
+    { name: 'Remover Maldición', nameEn: 'Remove Curse', level: 18, icon: 'spell_holy_removecurse' },
+    { name: 'Teletransporte: Ventormenta', nameEn: 'Teleport: Stormwind', level: 20, icon: 'spell_arcane_teleportstormwind' },
+    { name: 'Portal: Ventormenta', nameEn: 'Portal: Stormwind', level: 40, icon: 'spell_arcane_portalstormwind' },
+    { name: 'Teletransporte: Forjaz', nameEn: 'Teleport: Ironforge', level: 20, icon: 'spell_arcane_teleportironforge' },
+    { name: 'Portal: Forjaz', nameEn: 'Portal: Ironforge', level: 40, icon: 'spell_arcane_portalironforge' },
+    { name: 'Teletransporte: Darnassus', nameEn: 'Teleport: Darnassus', level: 20, icon: 'spell_arcane_teleportdarnassus' },
+    { name: 'Portal: Darnassus', nameEn: 'Portal: Darnassus', level: 40, icon: 'spell_arcane_portaldarnassus' },
+    { name: 'Teletransporte: Orgrimmar', nameEn: 'Teleport: Orgrimmar', level: 20, icon: 'spell_arcane_teleportorgrimmar' },
+    { name: 'Portal: Orgrimmar', nameEn: 'Portal: Orgrimmar', level: 40, icon: 'spell_arcane_portalorgrimmar' },
+    { name: 'Teletransporte: Entrañas', nameEn: 'Teleport: Undercity', level: 20, icon: 'spell_arcane_teleportundercity' },
+    { name: 'Portal: Entrañas', nameEn: 'Portal: Undercity', level: 40, icon: 'spell_arcane_portalundercity' },
+    { name: 'Teletransporte: Cima del Trueno', nameEn: 'Teleport: Thunder Bluff', level: 20, icon: 'spell_arcane_teleportthunderbluff' },
+    { name: 'Portal: Cima del Trueno', nameEn: 'Portal: Thunder Bluff', level: 40, icon: 'spell_arcane_portalthunderbluff' },
+    { name: 'Teletransporte: Marjal Revolcafango', nameEn: 'Teleport: Stonard', level: 20, icon: 'spell_arcane_teleportstonard' },
+    { name: 'Teletransporte: Theramore', nameEn: 'Teleport: Theramore', level: 20, icon: 'spell_arcane_teleporttheramore' }
+  ],
+  warlock: [
+    { name: 'Descarga de Sombras', nameEn: 'Shadow Bolt', level: 1, icon: 'spell_shadow_shadowbolt' },
+    { name: 'Corrupción', nameEn: 'Corruption', level: 4, icon: 'spell_shadow_abominationexplosion' },
+    { name: 'Maldición de Debilidad', nameEn: 'Curse of Weakness', level: 4, icon: 'spell_shadow_curseofsargeras' },
+    { name: 'Maldición de Agonía', nameEn: 'Curse of Agony', level: 8, icon: 'spell_shadow_curseofsargeras' },
+    { name: 'Miedo', nameEn: 'Fear', level: 8, icon: 'spell_shadow_possession' },
+    { name: 'Drenar Alma', nameEn: 'Drain Soul', level: 10, icon: 'spell_shadow_haunting' },
+    { name: 'Drenar Vida', nameEn: 'Drain Life', level: 14, icon: 'spell_shadow_lifedrain02' },
+    { name: 'Maldición de Temeridad', nameEn: 'Curse of Recklessness', level: 14, icon: 'spell_shadow_unholystrength' },
+    { name: 'Maldición de Lenguas', nameEn: 'Curse of Tongues', level: 26, icon: 'spell_shadow_curseoftounges' },
+    { name: 'Maldición de los Elementos', nameEn: 'Curse of the Elements', level: 32, icon: 'spell_shadow_chilltouch' },
+    { name: 'Maldición de las Sombras', nameEn: 'Curse of Shadow', level: 44, icon: 'spell_shadow_curseofsargeras' },
+    { name: 'Maldición de la Perdición', nameEn: 'Curse of Doom', level: 60, icon: 'spell_shadow_curseofmannoroth' },
+    { name: 'Sanguijuela de Vida', nameEn: 'Siphon Life', level: 30, icon: 'spell_shadow_requiem' },
+    { name: 'Drenar Maná', nameEn: 'Drain Mana', level: 24, icon: 'spell_shadow_siphonmana' },
+    { name: 'Aullido de Terror', nameEn: 'Howl of Terror', level: 40, icon: 'spell_shadow_deathscream' },
+    { name: 'Golpe de Muerte', nameEn: 'Death Coil', level: 42, icon: 'spell_shadow_deathcoil' },
+    { name: 'Piel de Demonio', nameEn: 'Demon Skin', level: 1, icon: 'spell_shadow_ragingscream' },
+    { name: 'Armadura Demoníaca', nameEn: 'Demon Armor', level: 20, icon: 'spell_shadow_ragingscream' },
+    { name: 'Crear Piedra de Salud', nameEn: 'Create Healthstone', level: 10, icon: 'inv_stone_04' },
+    { name: 'Crear Piedra de Alma', nameEn: 'Create Soulstone', level: 18, icon: 'inv_misc_orb_04' },
+    { name: 'Crear Piedra de Fuego', nameEn: 'Create Firestone', level: 28, icon: 'inv_misc_gem_bloodstone_02' },
+    { name: 'Crear Piedra de Hechizo', nameEn: 'Create Spellstone', level: 36, icon: 'inv_misc_gem_sapphire_01' },
+    { name: 'Aliento Inagotable', nameEn: 'Unending Breath', level: 16, icon: 'spell_shadow_demonbreath' },
+    { name: 'Ojo de Kilrogg', nameEn: 'Eye of Kilrogg', level: 22, icon: 'spell_shadow_evileye' },
+    { name: 'Ritual de Invocación', nameEn: 'Ritual of Summoning', level: 20, icon: 'spell_shadow_twilight' },
+    { name: 'Detectar Demonios', nameEn: 'Sense Demons', level: 24, icon: 'spell_shadow_metamorphosis' },
+    { name: 'Desterrar', nameEn: 'Banish', level: 28, icon: 'spell_shadow_cripple' },
+    { name: 'Esclavizar Demonio', nameEn: 'Enslave Demon', level: 30, icon: 'spell_shadow_enslavedemon' },
+    { name: 'Pacto Oscuro', nameEn: 'Dark Pact', level: 40, icon: 'spell_shadow_darkritual' },
+    { name: 'Invocar Esbirro', nameEn: 'Summon Imp', level: 1, icon: 'spell_shadow_summonimp' },
+    { name: 'Invocar Súcubo', nameEn: 'Summon Succubus', level: 20, icon: 'spell_shadow_summonsuccubus' },
+    { name: 'Invocar Abisario', nameEn: 'Summon Voidwalker', level: 10, icon: 'spell_shadow_summonvoidwalker' },
+    { name: 'Invocar Cazador de Demonios', nameEn: 'Summon Felhunter', level: 30, icon: 'spell_shadow_summonfelhunter' },
+    { name: 'Invocar Corcel Vil', nameEn: 'Summon Felsteed', level: 40, icon: 'spell_nature_swiftness' },
+    { name: 'Invocar Corcel de la Muerte', nameEn: 'Summon Dreadsteed', level: 60, icon: 'spell_nature_swiftness' }
+  ],
+  druid: [
+    { name: 'Cólera', nameEn: 'Wrath', level: 1, icon: 'spell_nature_wrathv2' },
+    { name: 'Sanar', nameEn: 'Healing Touch', level: 1, icon: 'spell_nature_healingtouch' },
+    { name: 'Marca de lo Salvaje', nameEn: 'Mark of the Wild', level: 1, icon: 'spell_nature_regeneration' },
+    { name: 'Fuego Lunar', nameEn: 'Moonfire', level: 4, icon: 'spell_nature_starfall' },
+    { name: 'Rejuvenecimiento', nameEn: 'Rejuvenation', level: 4, icon: 'spell_nature_rejuvenation' },
+    { name: 'Enredar', nameEn: 'Entangling Roots', level: 8, icon: 'spell_nature_stranglevines' },
+    { name: 'Forma de Oso', nameEn: 'Bear Form', level: 10, icon: 'ability_racial_bearform' },
+    { name: 'Regeneración', nameEn: 'Regrowth', level: 12, icon: 'spell_nature_regenerate' },
+    { name: 'Forma de Lobo', nameEn: 'Cat Form', level: 20, icon: 'ability_druid_catform' },
+    { name: 'Zarpa', nameEn: 'Claw', level: 20, icon: 'ability_druid_rake' },
+    { name: 'Mordisco', nameEn: 'Bite', level: 20, icon: 'ability_druid_ferociousbite' },
+    { name: 'Desgarrar', nameEn: 'Rip', level: 24, icon: 'ability_creature_poison_06' },
+    { name: 'Forma de Viaje', nameEn: 'Travel Form', level: 30, icon: 'ability_druid_travelform' },
+    { name: 'Forma de Lechúcico', nameEn: 'Moonkin Form', level: 40, icon: 'spell_nature_forceofnature' },
+    { name: 'Forma de Lobo Espectral', nameEn: 'Ghost Wolf', level: 20, icon: 'spell_nature_spiritwolf' },
+    { name: 'Curación Rápida', nameEn: 'Swiftmend', level: 40, icon: 'ability_druid_swiftmend' },
+    { name: 'Naturaleza Veloz', nameEn: 'Nature\'s Swiftness', level: 30, icon: 'spell_nature_ravenform' },
+    { name: 'Fuego Estelar', nameEn: 'Starfire', level: 20, icon: 'spell_arcane_starfire' },
+    { name: 'Huracán', nameEn: 'Hurricane', level: 40, icon: 'spell_nature_cyclone' },
+    { name: 'Tranquilidad', nameEn: 'Tranquility', level: 30, icon: 'spell_nature_tranquility' },
+    { name: 'Innervar', nameEn: 'Innervate', level: 40, icon: 'spell_nature_lightning' },
+    { name: 'Eliminar Maldición', nameEn: 'Remove Curse', level: 24, icon: 'spell_holy_removecurse' },
+    { name: 'Abrasar', nameEn: 'Abolish Poison', level: 26, icon: 'spell_nature_nullifypoison_02' },
+    { name: 'Curación en Grupo', nameEn: 'Healing Touch', level: 1, icon: 'spell_nature_healingtouch' }
+  ]
+};
+
+// Opciones de macro con descripciones para tooltips
+const MACRO_OPTIONS = [
+  { id: 'showtooltip', label: '#showtooltip', desc: 'Muestra el icono y tooltip del primer hechizo en la macro. Siempre recomendado.', default: true },
+  { id: 'startattack', label: '/startattack', desc: 'Inicia el ataque automático contra el objetivo actual. Útil para guerreros, pícaros, cazadores, etc.', default: false },
+  { id: 'petattack', label: '/petattack', desc: 'Ordena a tu mascota atacar al objetivo actual. Para cazadores, brujos y caballeros de la muerte.', default: false },
+  { id: 'stopcasting', label: '/stopcasting', desc: 'Interrumpe el lanzamiento actual. Útil para macros de interrupción o emergencia.', default: false },
+  { id: 'cancelaura', label: '/cancelaura [nombre]', desc: 'Cancela un buff o aura específico. Ejemplo: /cancelaura Bloque de Hielo.', default: false },
+  { id: 'castsequence', label: '/castsequence reset=...', desc: 'Convierte la secuencia en un castsequence que avanza paso a paso con cada pulsación.', default: false },
+  { id: 'mouseover', label: '[@mouseover]', desc: 'El hechizo se lanza sobre el objetivo bajo el cursor, sin necesidad de seleccionarlo.', default: false },
+  { id: 'harm', label: '[harm]', desc: 'Solo lanza el hechizo si el objetivo es hostil. Para hechizos de daño.', default: false },
+  { id: 'help', label: '[help]', desc: 'Solo lanza el hechizo si el objetivo es amistoso. Para hechizos de curación o buffs.', default: false },
+  { id: 'nodead', label: '[nodead]', desc: 'Solo lanza el hechizo si el objetivo está vivo. Evita desperdiciar hechizos en cadáveres.', default: false },
+  { id: 'exists', label: '[exists]', desc: 'Solo lanza el hechizo si el objetivo existe. Evita errores cuando no hay objetivo.', default: false },
+  { id: 'combat', label: '[combat]', desc: 'Solo lanza el hechizo si estás en combate.', default: false },
+  { id: 'nostance', label: '[nostance]', desc: 'Solo lanza el hechizo si no estás en una forma o actitud específica.', default: false },
+  { id: 'mod', label: '[mod:shift/ctrl/alt]', desc: 'Añade una rama condicional para modificadores de teclado. Requiere configurar los checkboxes de abajo.', default: false }
+];
+
+// ==================== LÓGICA DEL GENERADOR DE MACROS ====================
+
+let currentClass = null;
+let currentRace = null;
+let currentLevel = 60;
+let sequence = []; // Array de { name, nameEn, icon, level, type }
+
+// Inicializar selects
+function initSelects() {
+  const classSelect = document.getElementById('classSelect');
+  const talentClassSelect = document.getElementById('talentClassSelect');
+  
+  Object.entries(CLASSES).forEach(([key, val]) => {
+    const opt = document.createElement('option');
+    opt.value = key;
+    opt.textContent = `${val.name} (${val.nameEn})`;
+    classSelect.appendChild(opt);
+    
+    const opt2 = document.createElement('option');
+    opt2.value = key;
+    opt2.textContent = `${val.name} (${val.nameEn})`;
+    talentClassSelect.appendChild(opt2);
+  });
+}
+
+function onClassChange() {
+  currentClass = document.getElementById('classSelect').value;
+  updateRaceOptions();
+  updateSpellPool();
+  updateOptions();
+}
+
+function onRaceChange() {
+  currentRace = document.getElementById('raceSelect').value;
+  updateSpellPool();
+}
+
+function onLevelChange() {
+  currentLevel = parseInt(document.getElementById('levelInput').value) || 60;
+  updateSpellPool();
+}
+
+function updateRaceOptions() {
+  const raceSelect = document.getElementById('raceSelect');
+  raceSelect.innerHTML = '<option value="">— Selecciona raza —</option>';
+  
+  if (!currentClass) return;
+  
+  // Todas las razas disponibles para simplificar (en Classic hay restricciones, pero Forever puede variar)
+  Object.entries(RACES).forEach(([key, val]) => {
+    const opt = document.createElement('option');
+    opt.value = key;
+    opt.textContent = `${val.name} (${val.nameEn})`;
+    raceSelect.appendChild(opt);
+  });
+}
+
+function updateSpellPool() {
+  const pool = document.getElementById('spellPool');
+  pool.innerHTML = '';
+  
+  if (!currentClass) {
+    pool.innerHTML = '<div class="empty-hint">Selecciona clase y raza para ver los hechizos disponibles.</div>';
+    return;
+  }
+  
+  const spells = SPELLS[currentClass] || [];
+  const racials = currentRace ? (RACIALS[currentRace] || []) : [];
+  
+  // Combinar y filtrar por nivel
+  const allAbilities = [
+    ...spells.map(s => ({ ...s, type: 'spell' })),
+    ...racials.map(r => ({ ...r, type: 'racial' }))
+  ].filter(a => a.level <= currentLevel);
+  
+  if (allAbilities.length === 0) {
+    pool.innerHTML = '<div class="empty-hint">No hay hechizos disponibles para este nivel.</div>';
+    return;
+  }
+  
+  allAbilities.forEach(ability => {
+    const div = document.createElement('div');
+    div.className = 'spell-item';
+    div.draggable = true;
+    div.dataset.name = ability.name;
+    div.dataset.nameEn = ability.nameEn;
+    div.dataset.icon = ability.icon;
+    div.dataset.level = ability.level;
+    div.dataset.type = ability.type;
+    
+    // Icono (usando Wowhead CDN con el nombre del icono)
+    const img = document.createElement('img');
+    img.src = `https://wow.zamimg.com/images/wow/icons/small/${ability.icon}.jpg`;
+    img.alt = ability.name;
+    img.onerror = function() { this.style.display = 'none'; };
+    
+    const span = document.createElement('span');
+    span.textContent = ability.name;
+    
+    const levelBadge = document.createElement('small');
+    levelBadge.style.color = 'var(--text-muted)';
+    levelBadge.style.fontSize = '10px';
+    levelBadge.textContent = `Nv.${ability.level}`;
+    
+    div.appendChild(img);
+    div.appendChild(span);
+    div.appendChild(levelBadge);
+    
+    div.addEventListener('dragstart', onDragStart);
+    
+    pool.appendChild(div);
+  });
+}
+
+function updateOptions() {
+  const container = document.getElementById('macroOptions');
+  container.innerHTML = '';
+  
+  MACRO_OPTIONS.forEach(opt => {
+    const div = document.createElement('div');
+    div.className = 'option-item';
+    div.dataset.tooltip = opt.desc;
+    
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.id = `opt_${opt.id}`;
+    checkbox.checked = opt.default;
+    
+    const labelDiv = document.createElement('div');
+    const label = document.createElement('div');
+    label.className = 'option-label';
+    label.textContent = opt.label;
+    
+    const desc = document.createElement('div');
+    desc.className = 'option-desc';
+    desc.textContent = opt.desc.substring(0, 80) + (opt.desc.length > 80 ? '...' : '');
+    
+    labelDiv.appendChild(label);
+    labelDiv.appendChild(desc);
+    
+    div.appendChild(checkbox);
+    div.appendChild(labelDiv);
+    
+    container.appendChild(div);
+  });
+}
+
+// Drag & Drop
+let draggedItem = null;
+
+function onDragStart(e) {
+  draggedItem = {
+    name: e.target.dataset.name,
+    nameEn: e.target.dataset.nameEn,
+    icon: e.target.dataset.icon,
+    level: parseInt(e.target.dataset.level),
+    type: e.target.dataset.type
+  };
+  e.dataTransfer.effectAllowed = 'copy';
+  e.dataTransfer.setData('text/plain', e.target.dataset.name);
+}
+
+function onDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'copy';
+  document.getElementById('sequenceZone').classList.add('drag-over');
+}
+
+function onDragLeave(e) {
+  document.getElementById('sequenceZone').classList.remove('drag-over');
+}
+
+function onDrop(e) {
+  e.preventDefault();
+  document.getElementById('sequenceZone').classList.remove('drag-over');
+  
+  if (!draggedItem) return;
+  
+  sequence.push({ ...draggedItem });
+  renderSequence();
+  draggedItem = null;
+}
+
+function renderSequence() {
+  const zone = document.getElementById('sequenceZone');
+  
+  if (sequence.length === 0) {
+    zone.innerHTML = '<div class="empty-hint">Arrastra hechizos aquí para construir tu macro.<br>El orden importa: el primero se ejecutará primero.</div>';
+    return;
+  }
+  
+  zone.innerHTML = '';
+  
+  sequence.forEach((item, index) => {
+    const slot = document.createElement('div');
+    slot.className = 'sequence-slot';
+    slot.draggable = true;
+    
+    const idx = document.createElement('span');
+    idx.className = 'slot-index';
+    idx.textContent = `${index + 1}.`;
+    
+    const img = document.createElement('img');
+    img.src = `https://wow.zamimg.com/images/wow/icons/small/${item.icon}.jpg`;
+    img.onerror = function() { this.style.display = 'none'; };
+    
+    const name = document.createElement('span');
+    name.textContent = item.name;
+    name.style.fontSize = '13px';
+    
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'remove-btn';
+    removeBtn.textContent = '✕';
+    removeBtn.onclick = () => {
+      sequence.splice(index, 1);
+      renderSequence();
+    };
+    
+    slot.appendChild(idx);
+    slot.appendChild(img);
+    slot.appendChild(name);
+    slot.appendChild(removeBtn);
+    
+    zone.appendChild(slot);
+  });
+}
+
+function generateMacro() {
+  if (sequence.length === 0) {
+    document.getElementById('macroOutput').textContent = '⚠️ Añade al menos un hechizo a la secuencia.';
+    return;
+  }
+  
+  const lines = [];
+  
+  // #showtooltip
+  if (document.getElementById('opt_showtooltip')?.checked) {
+    lines.push('#showtooltip');
+  }
+  
+  // /startattack
+  if (document.getElementById('opt_startattack')?.checked) {
+    lines.push('/startattack');
+  }
+  
+  // /petattack
+  if (document.getElementById('opt_petattack')?.checked) {
+    lines.push('/petattack');
+  }
+  
+  // /stopcasting
+  if (document.getElementById('opt_stopcasting')?.checked) {
+    lines.push('/stopcasting');
+  }
+  
+  // /cancelaura
+  if (document.getElementById('opt_cancelaura')?.checked) {
+    const auraName = prompt('Nombre del aura a cancelar (ej: Bloque de Hielo):', 'Bloque de Hielo');
+    if (auraName) {
+      lines.push(`/cancelaura ${auraName}`);
+    }
+  }
+  
+  // Construir condiciones
+  const conditions = [];
+  
+  if (document.getElementById('opt_mouseover')?.checked) conditions.push('@mouseover');
+  if (document.getElementById('opt_harm')?.checked) conditions.push('harm');
+  if (document.getElementById('opt_help')?.checked) conditions.push('help');
+  if (document.getElementById('opt_nodead')?.checked) conditions.push('nodead');
+  if (document.getElementById('opt_exists')?.checked) conditions.push('exists');
+  if (document.getElementById('opt_combat')?.checked) conditions.push('combat');
+  
+  const conditionStr = conditions.length > 0 ? `[${conditions.join(',')}] ` : '';
+  
+  // Verificar modificadores
+  const modShift = document.getElementById('modShift')?.checked;
+  const modCtrl = document.getElementById('modCtrl')?.checked;
+  const modAlt = document.getElementById('modAlt')?.checked;
+  
+  const useCastsequence = document.getElementById('opt_castsequence')?.checked;
+  
+  if (useCastsequence) {
+    // Usar /castsequence
+    const spellNames = sequence.map(s => s.name).join(', ');
+    lines.push(`/castsequence reset=target ${conditionStr}${spellNames}`);
+  } else {
+    // Usar /cast normales (prioridad de bloques)
+    sequence.forEach((spell, i) => {
+      if (i === 0 && conditionStr) {
+        lines.push(`/cast ${conditionStr}${spell.name}`);
+      } else if (i === 0 && modShift) {
+        lines.push(`/cast [mod:shift] ${spell.name}`);
+      } else {
+        lines.push(`/cast ${spell.name}`);
+      }
+    });
+  }
+  
+  const macroText = lines.join('\n');
+  document.getElementById('macroOutput').textContent = macroText;
+  document.getElementById('copyBtn').style.display = 'inline-block';
+}
+
+function copyMacro() {
+  const text = document.getElementById('macroOutput').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyBtn');
+    const original = btn.textContent;
+    btn.textContent = '✅ ¡Copiado!';
+    setTimeout(() => btn.textContent = original, 1500);
+  }).catch(() => {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    alert('Macro copiada al portapapeles.');
+  });
+}
+
+// ==================== LÓGICA DEL SIMULADOR DE TALENTOS ====================
+
+// Datos simplificados de talentos por clase (3 árboles, niveles 10-60)
+// Cada talento: { name, nameEn, maxRank, desc, benefit }
+const TALENT_DATA = {
+  warrior: {
+    trees: [
+      { name: 'Armas', nameEn: 'Arms', talents: [
+        { name: 'Golpe Mejorado', nameEn: 'Improved Strike', maxRank: 3, desc: 'Aumenta el daño de Golpe Heroico y Rend.', benefit: '+15% daño en habilidades básicas.' },
+        { name: 'Especialización en Hachas', nameEn: 'Axe Specialization', maxRank: 5, desc: 'Aumenta la probabilidad de crítico con hachas.', benefit: '+5% crítico con hachas.' },
+        { name: 'Golpe Mortal', nameEn: 'Mortal Strike', maxRank: 1, desc: 'Habilidad activa que causa daño y reduce curación.', benefit: 'Desbloquea Golpe Mortal: 200% daño de arma, -50% curación en objetivo.' },
+        { name: 'Sed de Sangre', nameEn: 'Bloodthirst', maxRank: 1, desc: 'Habilidad activa que cura al guerrero.', benefit: 'Desbloquea Sed de Sangre: daño + curación propia.' }
+      ]},
+      { name: 'Furia', nameEn: 'Fury', talents: [
+        { name: 'Rabia Mejorada', nameEn: 'Improved Berserker Rage', maxRank: 3, desc: 'Aumenta la generación de ira.', benefit: '+9 ira por uso de Rabia.' },
+        { name: 'Ejecución Mejorada', nameEn: 'Improved Execute', maxRank: 2, desc: 'Reduce el costo de ira de Ejecutar.', benefit: '-5 ira en Ejecutar.' },
+        { name: 'Torbellino Mejorado', nameEn: 'Improved Whirlwind', maxRank: 3, desc: 'Aumenta el daño de Torbellino.', benefit: '+15% daño de Torbellino.' },
+        { name: 'Muerte Repentina', nameEn: 'Sudden Death', maxRank: 3, desc: 'Permite usar Ejecutar sin importar la vida del objetivo.', benefit: '15% probabilidad de Ejecutar gratis.' }
+      ]},
+      { name: 'Protección', nameEn: 'Protection', talents: [
+        { name: 'Resistencia', nameEn: 'Toughness', maxRank: 5, desc: 'Aumenta la armadura.', benefit: '+10% armadura.' },
+        { name: 'Muro de Escudo Mejorado', nameEn: 'Improved Shield Wall', maxRank: 2, desc: 'Aumenta la duración de Muro de Escudo.', benefit: '+3s duración.' },
+        { name: 'Provocación Mejorada', nameEn: 'Improved Taunt', maxRank: 2, desc: 'Reduce el tiempo de reutilización de Provocar.', benefit: '-2s CD.' },
+        { name: 'Escudo de la Tempestad', nameEn: 'Shield Slam', maxRank: 1, desc: 'Habilidad activa de daño y generación de amenaza.', benefit: 'Desbloquea Golpe de Escudo: alto daño + amenaza.' }
+      ]}
+    ]
+  },
+  mage: {
+    trees: [
+      { name: 'Arcano', nameEn: 'Arcane', talents: [
+        { name: 'Concentración Arcana', nameEn: 'Arcane Concentration', maxRank: 5, desc: 'Aumenta la probabilidad de lanzamiento sin costo de maná.', benefit: '10% probabilidad de hechizo gratis.' },
+        { name: 'Misiles Mejorados', nameEn: 'Improved Arcane Missiles', maxRank: 3, desc: 'Reduce el tiempo de lanzamiento.', benefit: '-0.5s lanzamiento.' },
+        { name: 'Poder Arcano', nameEn: 'Arcane Power', maxRank: 1, desc: 'Aumenta el daño y costo de maná temporalmente.', benefit: '+30% daño, +30% costo maná por 15s.' },
+        { name: 'Presencia Mental', nameEn: 'Presence of Mind', maxRank: 1, desc: 'El siguiente hechizo se lanza instantáneamente.', benefit: 'Hechizo instantáneo cada 3 min.' }
+      ]},
+      { name: 'Fuego', nameEn: 'Fire', talents: [
+        { name: 'Impacto', nameEn: 'Impact', maxRank: 5, desc: 'Da a los hechizos de fuego probabilidad de aturdir.', benefit: '10% probabilidad de aturdir.' },
+        { name: 'Ignición', nameEn: 'Ignite', maxRank: 5, desc: 'Los críticos de fuego causan daño adicional en el tiempo.', benefit: '40% del daño crítico como DoT.' },
+        { name: 'Piroexplosión', nameEn: 'Pyroblast', maxRank: 1, desc: 'Hechizo de fuego de alto daño y lento.', benefit: 'Desbloquea Piroexplosión: gran daño + DoT.' },
+        { name: 'Combustión', nameEn: 'Combustion', maxRank: 1, desc: 'Aumenta la probabilidad de crítico de fuego.', benefit: '+10% crítico por 15s.' }
+      ]},
+      { name: 'Escarcha', nameEn: 'Frost', talents: [
+        { name: 'Escarcha Mejorada', nameEn: 'Improved Frostbolt', maxRank: 5, desc: 'Reduce el tiempo de lanzamiento de Escarcha.', benefit: '-0.5s lanzamiento.' },
+        { name: 'Nova Mejorada', nameEn: 'Improved Frost Nova', maxRank: 2, desc: 'Reduce el tiempo de reutilización de Nova de Escarcha.', benefit: '-4s CD.' },
+        { name: 'Barrera de Hielo', nameEn: 'Ice Barrier', maxRank: 1, desc: 'Escudo que absorbe daño.', benefit: 'Desbloquea Barrera de Hielo: absorbe daño.' },
+        { name: 'Bloque de Hielo', nameEn: 'Ice Block', maxRank: 1, desc: 'Inmunidad temporal pero no puedes actuar.', benefit: 'Desbloquea Bloque de Hielo: inmunidad 10s.' }
+      ]}
+    ]
+  },
+  // Añadir más clases según sea necesario... (por brevedad, solo 2 clases en este bloque)
+  // El usuario puede expandir TALENT_DATA siguiendo el mismo formato.
+};
+
+let talentState = {}; // { classKey: { treeIndex: { talentIndex: rank } } }
+let talentPointsSpent = 0;
+
+function onTalentClassChange() {
+  const classKey = document.getElementById('talentClassSelect').value;
+  if (!classKey || !TALENT_DATA[classKey]) {
+    document.getElementById('talentTrees').innerHTML = '<div class="empty-hint" style="width:100%;">Datos de talentos no disponibles para esta clase en la demo. Puedes expandir TALENT_DATA en el código.</div>';
+    return;
+  }
+  
+  talentState = {};
+  talentPointsSpent = 0;
+  renderTalentTrees(classKey);
+  updatePointsRemaining();
+}
+
+function onTalentLevelChange() {
+  updatePointsRemaining();
+}
+
+function updatePointsRemaining() {
+  const level = parseInt(document.getElementById('talentLevelInput').value) || 60;
+  const maxPoints = Math.max(0, level - 9); // Nivel 10 = 1 punto, nivel 60 = 51 puntos
+  const remaining = maxPoints - talentPointsSpent;
+  document.getElementById('pointsRemaining').textContent = `Puntos disponibles: ${remaining} / ${maxPoints}`;
+}
+
+function renderTalentTrees(classKey) {
+  const data = TALENT_DATA[classKey];
+  if (!data) return;
+  
+  const container = document.getElementById('talentTrees');
+  container.innerHTML = '';
+  
+  data.trees.forEach((tree, treeIdx) => {
+    const treeDiv = document.createElement('div');
+    treeDiv.className = 'talent-tree';
+    
+    const h4 = document.createElement('h4');
+    h4.textContent = `${tree.name} (${tree.nameEn})`;
+    treeDiv.appendChild(h4);
+    
+    tree.talents.forEach((talent, talentIdx) => {
+      const row = document.createElement('div');
+      row.className = 'talent-row';
+      
+      const node = document.createElement('div');
+      node.className = 'talent-node';
+      node.dataset.tree = treeIdx;
+      node.dataset.talent = talentIdx;
+      node.dataset.class = classKey;
+      
+      const currentRank = talentState[classKey]?.[treeIdx]?.[talentIdx] || 0;
+      if (currentRank > 0) {
+        node.classList.add(`rank-${Math.min(currentRank, 3)}`);
+      }
+      
+      // Contenido del nodo: iniciales o icono
+      const initials = talent.name.split(' ').map(w => w[0]).join('').substring(0, 2);
+      node.textContent = initials;
+      
+      if (currentRank > 0) {
+        const badge = document.createElement('span');
+        badge.className = 'rank-badge';
+        badge.textContent = `${currentRank}/${talent.maxRank}`;
+        node.appendChild(badge);
+      }
+      
+      // Tooltip / click
+      node.addEventListener('mouseenter', () => showTalentInfo(talent, currentRank));
+      node.addEventListener('click', () => addTalentPoint(classKey, treeIdx, talentIdx, talent));
+      
+      row.appendChild(node);
+      treeDiv.appendChild(row);
+    });
+    
+    container.appendChild(treeDiv);
+  });
+}
+
+function addTalentPoint(classKey, treeIdx, talentIdx, talent) {
+  const level = parseInt(document.getElementById('talentLevelInput').value) || 60;
+  const maxPoints = Math.max(0, level - 9);
+  
+  if (talentPointsSpent >= maxPoints) {
+    alert('No tienes más puntos de talento disponibles. Sube de nivel para obtener más.');
+    return;
+  }
+  
+  if (!talentState[classKey]) talentState[classKey] = {};
+  if (!talentState[classKey][treeIdx]) talentState[classKey][treeIdx] = {};
+  
+  const currentRank = talentState[classKey][treeIdx][talentIdx] || 0;
+  
+  if (currentRank >= talent.maxRank) {
+    // Resetear si ya está al máximo (opcional)
+    talentState[classKey][treeIdx][talentIdx] = 0;
+    talentPointsSpent--;
+  } else {
+    talentState[classKey][treeIdx][talentIdx] = currentRank + 1;
+    talentPointsSpent++;
+  }
+  
+  renderTalentTrees(classKey);
+  updatePointsRemaining();
+  showTalentInfo(talent, talentState[classKey][treeIdx][talentIdx] || 0);
+}
+
+function showTalentInfo(talent, currentRank) {
+  const panel = document.getElementById('talentInfoPanel');
+  panel.innerHTML = `
+    <h4>${talent.name} <small style="color:var(--text-muted);font-size:13px;">(${talent.nameEn})</small></h4>
+    <div class="talent-desc">${talent.desc}</div>
+    <div class="talent-benefit">
+      <strong>Beneficio:</strong> ${talent.benefit}
+    </div>
+    <div style="font-size:12px;color:var(--text-muted);margin-top:10px;">
+      Rango actual: ${currentRank} / ${talent.maxRank}
+    </div>
+  `;
+}
+
+// ==================== INICIALIZACIÓN ====================
+function switchTab(tabName) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  
+  document.getElementById(`tab-${tabName}`).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// Iniciar al cargar
+document.addEventListener('DOMContentLoaded', () => {
+  initSelects();
+  updateOptions();
+  
+  // Inicializar secuencia vacía
+  renderSequence();
+  
+  // Configurar evento para el nivel de talentos
+  document.getElementById('talentLevelInput').addEventListener('change', onTalentLevelChange);
+});
+</script>
+
+</body>
+</html>

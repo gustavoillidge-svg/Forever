@@ -1,0 +1,8 @@
+﻿# OS/editor
+Thumbs.db
+.DS_Store
+*.log
+.env
+
+# temp download scripts
+*.ps1.tmp

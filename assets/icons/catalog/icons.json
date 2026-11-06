@@ -1,0 +1,1621 @@
+{
+    "value":  [
+                  {
+                      "id":  "ability_backstab",
+                      "local":  "assets/icons/small/ability_backstab.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_backstab.jpg",
+                      "status":  "downloaded",
+                      "bytes":  615
+                  },
+                  {
+                      "id":  "ability_cheapshot",
+                      "local":  "assets/icons/small/ability_cheapshot.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_cheapshot.jpg",
+                      "status":  "downloaded",
+                      "bytes":  637
+                  },
+                  {
+                      "id":  "ability_creature_cursed_02",
+                      "local":  "assets/icons/small/ability_creature_cursed_02.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_creature_cursed_02.jpg",
+                      "status":  "downloaded",
+                      "bytes":  629
+                  },
+                  {
+                      "id":  "ability_creature_poison_06",
+                      "local":  "assets/icons/small/ability_creature_poison_06.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_creature_poison_06.jpg",
+                      "status":  "downloaded",
+                      "bytes":  679
+                  },
+                  {
+                      "id":  "ability_defend",
+                      "local":  "assets/icons/small/ability_defend.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_defend.jpg",
+                      "status":  "downloaded",
+                      "bytes":  593
+                  },
+                  {
+                      "id":  "ability_druid_catform",
+                      "local":  "assets/icons/small/ability_druid_catform.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_druid_catform.jpg",
+                      "status":  "downloaded",
+                      "bytes":  676
+                  },
+                  {
+                      "id":  "ability_druid_cower",
+                      "local":  "assets/icons/small/ability_druid_cower.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_druid_cower.jpg",
+                      "status":  "downloaded",
+                      "bytes":  623
+                  },
+                  {
+                      "id":  "ability_druid_ferociousbite",
+                      "local":  "assets/icons/small/ability_druid_ferociousbite.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_druid_ferociousbite.jpg",
+                      "status":  "downloaded",
+                      "bytes":  685
+                  },
+                  {
+                      "id":  "ability_druid_rake",
+                      "local":  "assets/icons/small/ability_druid_rake.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_druid_rake.jpg",
+                      "status":  "downloaded",
+                      "bytes":  610
+                  },
+                  {
+                      "id":  "ability_druid_swiftmend",
+                      "local":  "",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_druid_swiftmend.jpg",
+                      "status":  "failed",
+                      "bytes":  0,
+                      "error":  "Error en el servidor remoto: (404) No se encontró."
+                  },
+                  {
+                      "id":  "ability_druid_travelform",
+                      "local":  "assets/icons/small/ability_druid_travelform.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_druid_travelform.jpg",
+                      "status":  "downloaded",
+                      "bytes":  637
+                  },
+                  {
+                      "id":  "ability_gouge",
+                      "local":  "assets/icons/small/ability_gouge.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_gouge.jpg",
+                      "status":  "downloaded",
+                      "bytes":  668
+                  },
+                  {
+                      "id":  "ability_groan",
+                      "local":  "",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_groan.jpg",
+                      "status":  "failed",
+                      "bytes":  0,
+                      "error":  "Error en el servidor remoto: (404) No se encontró."
+                  },
+                  {
+                      "id":  "ability_hunter_aspectofthemonkey",
+                      "local":  "assets/icons/small/ability_hunter_aspectofthemonkey.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_hunter_aspectofthemonkey.jpg",
+                      "status":  "downloaded",
+                      "bytes":  610
+                  },
+                  {
+                      "id":  "ability_hunter_criticalshot",
+                      "local":  "assets/icons/small/ability_hunter_criticalshot.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_hunter_criticalshot.jpg",
+                      "status":  "downloaded",
+                      "bytes":  612
+                  },
+                  {
+                      "id":  "ability_hunter_quickshot",
+                      "local":  "assets/icons/small/ability_hunter_quickshot.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_hunter_quickshot.jpg",
+                      "status":  "downloaded",
+                      "bytes":  602
+                  },
+                  {
+                      "id":  "ability_hunter_rapidkilling",
+                      "local":  "assets/icons/small/ability_hunter_rapidkilling.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_hunter_rapidkilling.jpg",
+                      "status":  "downloaded",
+                      "bytes":  613
+                  },
+                  {
+                      "id":  "ability_hunter_snipershot",
+                      "local":  "assets/icons/small/ability_hunter_snipershot.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_hunter_snipershot.jpg",
+                      "status":  "downloaded",
+                      "bytes":  673
+                  },
+                  {
+                      "id":  "ability_hunter_swiftstrike",
+                      "local":  "assets/icons/small/ability_hunter_swiftstrike.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_hunter_swiftstrike.jpg",
+                      "status":  "downloaded",
+                      "bytes":  609
+                  },
+                  {
+                      "id":  "ability_kick",
+                      "local":  "assets/icons/small/ability_kick.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_kick.jpg",
+                      "status":  "downloaded",
+                      "bytes":  530
+                  },
+                  {
+                      "id":  "ability_meleedamage",
+                      "local":  "assets/icons/small/ability_meleedamage.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_meleedamage.jpg",
+                      "status":  "downloaded",
+                      "bytes":  591
+                  },
+                  {
+                      "id":  "ability_mount_jungletiger",
+                      "local":  "assets/icons/small/ability_mount_jungletiger.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_mount_jungletiger.jpg",
+                      "status":  "downloaded",
+                      "bytes":  670
+                  },
+                  {
+                      "id":  "ability_mount_pinktiger",
+                      "local":  "assets/icons/small/ability_mount_pinktiger.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_mount_pinktiger.jpg",
+                      "status":  "downloaded",
+                      "bytes":  658
+                  },
+                  {
+                      "id":  "ability_paladin_blessedmending",
+                      "local":  "assets/icons/small/ability_paladin_blessedmending.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_paladin_blessedmending.jpg",
+                      "status":  "downloaded",
+                      "bytes":  588
+                  },
+                  {
+                      "id":  "ability_poisonsting",
+                      "local":  "assets/icons/small/ability_poisonsting.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_poisonsting.jpg",
+                      "status":  "downloaded",
+                      "bytes":  602
+                  },
+                  {
+                      "id":  "ability_racial_bearform",
+                      "local":  "assets/icons/small/ability_racial_bearform.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_racial_bearform.jpg",
+                      "status":  "downloaded",
+                      "bytes":  627
+                  },
+                  {
+                      "id":  "ability_racial_plainsrunning",
+                      "local":  "",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_racial_plainsrunning.jpg",
+                      "status":  "failed",
+                      "bytes":  0,
+                      "error":  "Error en el servidor remoto: (404) No se encontró."
+                  },
+                  {
+                      "id":  "ability_rogue_eviscerate",
+                      "local":  "assets/icons/small/ability_rogue_eviscerate.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_rogue_eviscerate.jpg",
+                      "status":  "downloaded",
+                      "bytes":  704
+                  },
+                  {
+                      "id":  "ability_rogue_feigndeath",
+                      "local":  "assets/icons/small/ability_rogue_feigndeath.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_rogue_feigndeath.jpg",
+                      "status":  "downloaded",
+                      "bytes":  611
+                  },
+                  {
+                      "id":  "ability_rogue_feint",
+                      "local":  "assets/icons/small/ability_rogue_feint.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_rogue_feint.jpg",
+                      "status":  "downloaded",
+                      "bytes":  624
+                  },
+                  {
+                      "id":  "ability_rogue_heroicstrike",
+                      "local":  "",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_rogue_heroicstrike.jpg",
+                      "status":  "failed",
+                      "bytes":  0,
+                      "error":  "Error en el servidor remoto: (404) No se encontró."
+                  },
+                  {
+                      "id":  "ability_rogue_kidneyshot",
+                      "local":  "assets/icons/small/ability_rogue_kidneyshot.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_rogue_kidneyshot.jpg",
+                      "status":  "downloaded",
+                      "bytes":  629
+                  },
+                  {
+                      "id":  "ability_rogue_rupture",
+                      "local":  "assets/icons/small/ability_rogue_rupture.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_rogue_rupture.jpg",
+                      "status":  "downloaded",
+                      "bytes":  665
+                  },
+                  {
+                      "id":  "ability_rogue_sprint",
+                      "local":  "assets/icons/small/ability_rogue_sprint.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_rogue_sprint.jpg",
+                      "status":  "downloaded",
+                      "bytes":  679
+                  },
+                  {
+                      "id":  "ability_stealth",
+                      "local":  "assets/icons/small/ability_stealth.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_stealth.jpg",
+                      "status":  "downloaded",
+                      "bytes":  622
+                  },
+                  {
+                      "id":  "ability_thunderclap",
+                      "local":  "assets/icons/small/ability_thunderclap.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_thunderclap.jpg",
+                      "status":  "downloaded",
+                      "bytes":  644
+                  },
+                  {
+                      "id":  "ability_upgrademoonglaive",
+                      "local":  "assets/icons/small/ability_upgrademoonglaive.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_upgrademoonglaive.jpg",
+                      "status":  "downloaded",
+                      "bytes":  652
+                  },
+                  {
+                      "id":  "ability_vanish",
+                      "local":  "assets/icons/small/ability_vanish.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_vanish.jpg",
+                      "status":  "downloaded",
+                      "bytes":  485
+                  },
+                  {
+                      "id":  "ability_warrior_battleshout",
+                      "local":  "assets/icons/small/ability_warrior_battleshout.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_warrior_battleshout.jpg",
+                      "status":  "downloaded",
+                      "bytes":  629
+                  },
+                  {
+                      "id":  "ability_warrior_challange",
+                      "local":  "assets/icons/small/ability_warrior_challange.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_warrior_challange.jpg",
+                      "status":  "downloaded",
+                      "bytes":  681
+                  },
+                  {
+                      "id":  "ability_warrior_charge",
+                      "local":  "assets/icons/small/ability_warrior_charge.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_warrior_charge.jpg",
+                      "status":  "downloaded",
+                      "bytes":  657
+                  },
+                  {
+                      "id":  "ability_warrior_cleave",
+                      "local":  "assets/icons/small/ability_warrior_cleave.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_warrior_cleave.jpg",
+                      "status":  "downloaded",
+                      "bytes":  668
+                  },
+                  {
+                      "id":  "ability_warrior_revenge",
+                      "local":  "assets/icons/small/ability_warrior_revenge.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_warrior_revenge.jpg",
+                      "status":  "downloaded",
+                      "bytes":  611
+                  },
+                  {
+                      "id":  "ability_warrior_savageblow",
+                      "local":  "assets/icons/small/ability_warrior_savageblow.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_warrior_savageblow.jpg",
+                      "status":  "downloaded",
+                      "bytes":  636
+                  },
+                  {
+                      "id":  "ability_warrior_shieldwall",
+                      "local":  "assets/icons/small/ability_warrior_shieldwall.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_warrior_shieldwall.jpg",
+                      "status":  "downloaded",
+                      "bytes":  582
+                  },
+                  {
+                      "id":  "ability_warrior_sunderarmor",
+                      "local":  "",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_warrior_sunderarmor.jpg",
+                      "status":  "failed",
+                      "bytes":  0,
+                      "error":  "Error en el servidor remoto: (404) No se encontró."
+                  },
+                  {
+                      "id":  "ability_warrior_victoryrush",
+                      "local":  "assets/icons/small/ability_warrior_victoryrush.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_warrior_victoryrush.jpg",
+                      "status":  "downloaded",
+                      "bytes":  634
+                  },
+                  {
+                      "id":  "ability_warstomp",
+                      "local":  "assets/icons/small/ability_warstomp.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_warstomp.jpg",
+                      "status":  "downloaded",
+                      "bytes":  594
+                  },
+                  {
+                      "id":  "ability_whirlwind",
+                      "local":  "assets/icons/small/ability_whirlwind.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/ability_whirlwind.jpg",
+                      "status":  "downloaded",
+                      "bytes":  688
+                  },
+                  {
+                      "id":  "achievement_character_dwarf_male",
+                      "local":  "assets/icons/small/achievement_character_dwarf_male.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/achievement_character_dwarf_male.jpg",
+                      "status":  "downloaded",
+                      "bytes":  624
+                  },
+                  {
+                      "id":  "achievement_character_gnome_male",
+                      "local":  "assets/icons/small/achievement_character_gnome_male.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/achievement_character_gnome_male.jpg",
+                      "status":  "downloaded",
+                      "bytes":  664
+                  },
+                  {
+                      "id":  "achievement_character_human_male",
+                      "local":  "assets/icons/small/achievement_character_human_male.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/achievement_character_human_male.jpg",
+                      "status":  "downloaded",
+                      "bytes":  596
+                  },
+                  {
+                      "id":  "achievement_character_nightelf_male",
+                      "local":  "assets/icons/small/achievement_character_nightelf_male.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/achievement_character_nightelf_male.jpg",
+                      "status":  "downloaded",
+                      "bytes":  600
+                  },
+                  {
+                      "id":  "achievement_character_orc_male",
+                      "local":  "assets/icons/small/achievement_character_orc_male.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/achievement_character_orc_male.jpg",
+                      "status":  "downloaded",
+                      "bytes":  633
+                  },
+                  {
+                      "id":  "achievement_character_tauren_male",
+                      "local":  "assets/icons/small/achievement_character_tauren_male.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/achievement_character_tauren_male.jpg",
+                      "status":  "downloaded",
+                      "bytes":  632
+                  },
+                  {
+                      "id":  "achievement_character_troll_male",
+                      "local":  "assets/icons/small/achievement_character_troll_male.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/achievement_character_troll_male.jpg",
+                      "status":  "downloaded",
+                      "bytes":  643
+                  },
+                  {
+                      "id":  "achievement_character_undead_male",
+                      "local":  "assets/icons/small/achievement_character_undead_male.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/achievement_character_undead_male.jpg",
+                      "status":  "downloaded",
+                      "bytes":  626
+                  },
+                  {
+                      "id":  "inv_axe_01",
+                      "local":  "assets/icons/small/inv_axe_01.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/inv_axe_01.jpg",
+                      "status":  "downloaded",
+                      "bytes":  598
+                  },
+                  {
+                      "id":  "inv_mace_01",
+                      "local":  "assets/icons/small/inv_mace_01.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/inv_mace_01.jpg",
+                      "status":  "downloaded",
+                      "bytes":  585
+                  },
+                  {
+                      "id":  "inv_misc_gem_bloodstone_02",
+                      "local":  "assets/icons/small/inv_misc_gem_bloodstone_02.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/inv_misc_gem_bloodstone_02.jpg",
+                      "status":  "downloaded",
+                      "bytes":  635
+                  },
+                  {
+                      "id":  "inv_misc_gem_sapphire_01",
+                      "local":  "assets/icons/small/inv_misc_gem_sapphire_01.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/inv_misc_gem_sapphire_01.jpg",
+                      "status":  "downloaded",
+                      "bytes":  667
+                  },
+                  {
+                      "id":  "inv_misc_herb_16",
+                      "local":  "assets/icons/small/inv_misc_herb_16.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/inv_misc_herb_16.jpg",
+                      "status":  "downloaded",
+                      "bytes":  615
+                  },
+                  {
+                      "id":  "inv_misc_orb_04",
+                      "local":  "assets/icons/small/inv_misc_orb_04.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/inv_misc_orb_04.jpg",
+                      "status":  "downloaded",
+                      "bytes":  622
+                  },
+                  {
+                      "id":  "inv_shield_05",
+                      "local":  "assets/icons/small/inv_shield_05.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/inv_shield_05.jpg",
+                      "status":  "downloaded",
+                      "bytes":  653
+                  },
+                  {
+                      "id":  "inv_spear_04",
+                      "local":  "assets/icons/small/inv_spear_04.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/inv_spear_04.jpg",
+                      "status":  "downloaded",
+                      "bytes":  662
+                  },
+                  {
+                      "id":  "inv_spear_07",
+                      "local":  "assets/icons/small/inv_spear_07.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/inv_spear_07.jpg",
+                      "status":  "downloaded",
+                      "bytes":  627
+                  },
+                  {
+                      "id":  "inv_stone_04",
+                      "local":  "assets/icons/small/inv_stone_04.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/inv_stone_04.jpg",
+                      "status":  "downloaded",
+                      "bytes":  662
+                  },
+                  {
+                      "id":  "inv_sword_48",
+                      "local":  "assets/icons/small/inv_sword_48.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/inv_sword_48.jpg",
+                      "status":  "downloaded",
+                      "bytes":  692
+                  },
+                  {
+                      "id":  "inv_weapon_halberd_04",
+                      "local":  "assets/icons/small/inv_weapon_halberd_04.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/inv_weapon_halberd_04.jpg",
+                      "status":  "downloaded",
+                      "bytes":  570
+                  },
+                  {
+                      "id":  "racial_troll_berserk",
+                      "local":  "assets/icons/small/racial_troll_berserk.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/racial_troll_berserk.jpg",
+                      "status":  "downloaded",
+                      "bytes":  665
+                  },
+                  {
+                      "id":  "spell_arcane_arcane01",
+                      "local":  "assets/icons/small/spell_arcane_arcane01.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_arcane_arcane01.jpg",
+                      "status":  "downloaded",
+                      "bytes":  678
+                  },
+                  {
+                      "id":  "spell_arcane_arcane03",
+                      "local":  "assets/icons/small/spell_arcane_arcane03.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_arcane_arcane03.jpg",
+                      "status":  "downloaded",
+                      "bytes":  682
+                  },
+                  {
+                      "id":  "spell_arcane_arcaneshot",
+                      "local":  "",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_arcane_arcaneshot.jpg",
+                      "status":  "failed",
+                      "bytes":  0,
+                      "error":  "Error en el servidor remoto: (404) No se encontró."
+                  },
+                  {
+                      "id":  "spell_arcane_portaldarnassus",
+                      "local":  "assets/icons/small/spell_arcane_portaldarnassus.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_arcane_portaldarnassus.jpg",
+                      "status":  "downloaded",
+                      "bytes":  670
+                  },
+                  {
+                      "id":  "spell_arcane_portalironforge",
+                      "local":  "assets/icons/small/spell_arcane_portalironforge.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_arcane_portalironforge.jpg",
+                      "status":  "downloaded",
+                      "bytes":  645
+                  },
+                  {
+                      "id":  "spell_arcane_portalorgrimmar",
+                      "local":  "assets/icons/small/spell_arcane_portalorgrimmar.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_arcane_portalorgrimmar.jpg",
+                      "status":  "downloaded",
+                      "bytes":  670
+                  },
+                  {
+                      "id":  "spell_arcane_portalstormwind",
+                      "local":  "assets/icons/small/spell_arcane_portalstormwind.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_arcane_portalstormwind.jpg",
+                      "status":  "downloaded",
+                      "bytes":  654
+                  },
+                  {
+                      "id":  "spell_arcane_portalthunderbluff",
+                      "local":  "assets/icons/small/spell_arcane_portalthunderbluff.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_arcane_portalthunderbluff.jpg",
+                      "status":  "downloaded",
+                      "bytes":  670
+                  },
+                  {
+                      "id":  "spell_arcane_portalundercity",
+                      "local":  "assets/icons/small/spell_arcane_portalundercity.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_arcane_portalundercity.jpg",
+                      "status":  "downloaded",
+                      "bytes":  701
+                  },
+                  {
+                      "id":  "spell_arcane_starfire",
+                      "local":  "assets/icons/small/spell_arcane_starfire.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_arcane_starfire.jpg",
+                      "status":  "downloaded",
+                      "bytes":  670
+                  },
+                  {
+                      "id":  "spell_arcane_teleportdarnassus",
+                      "local":  "assets/icons/small/spell_arcane_teleportdarnassus.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_arcane_teleportdarnassus.jpg",
+                      "status":  "downloaded",
+                      "bytes":  586
+                  },
+                  {
+                      "id":  "spell_arcane_teleportironforge",
+                      "local":  "assets/icons/small/spell_arcane_teleportironforge.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_arcane_teleportironforge.jpg",
+                      "status":  "downloaded",
+                      "bytes":  569
+                  },
+                  {
+                      "id":  "spell_arcane_teleportorgrimmar",
+                      "local":  "assets/icons/small/spell_arcane_teleportorgrimmar.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_arcane_teleportorgrimmar.jpg",
+                      "status":  "downloaded",
+                      "bytes":  606
+                  },
+                  {
+                      "id":  "spell_arcane_teleportstonard",
+                      "local":  "assets/icons/small/spell_arcane_teleportstonard.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_arcane_teleportstonard.jpg",
+                      "status":  "downloaded",
+                      "bytes":  646
+                  },
+                  {
+                      "id":  "spell_arcane_teleportstormwind",
+                      "local":  "assets/icons/small/spell_arcane_teleportstormwind.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_arcane_teleportstormwind.jpg",
+                      "status":  "downloaded",
+                      "bytes":  632
+                  },
+                  {
+                      "id":  "spell_arcane_teleporttheramore",
+                      "local":  "assets/icons/small/spell_arcane_teleporttheramore.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_arcane_teleporttheramore.jpg",
+                      "status":  "downloaded",
+                      "bytes":  656
+                  },
+                  {
+                      "id":  "spell_arcane_teleportthunderbluff",
+                      "local":  "assets/icons/small/spell_arcane_teleportthunderbluff.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_arcane_teleportthunderbluff.jpg",
+                      "status":  "downloaded",
+                      "bytes":  626
+                  },
+                  {
+                      "id":  "spell_arcane_teleportundercity",
+                      "local":  "assets/icons/small/spell_arcane_teleportundercity.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_arcane_teleportundercity.jpg",
+                      "status":  "downloaded",
+                      "bytes":  658
+                  },
+                  {
+                      "id":  "spell_fire_firearmor",
+                      "local":  "assets/icons/small/spell_fire_firearmor.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_fire_firearmor.jpg",
+                      "status":  "downloaded",
+                      "bytes":  622
+                  },
+                  {
+                      "id":  "spell_fire_firearrow",
+                      "local":  "",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_fire_firearrow.jpg",
+                      "status":  "failed",
+                      "bytes":  0,
+                      "error":  "Error en el servidor remoto: (404) No se encontró."
+                  },
+                  {
+                      "id":  "spell_fire_fireball",
+                      "local":  "assets/icons/small/spell_fire_fireball.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_fire_fireball.jpg",
+                      "status":  "downloaded",
+                      "bytes":  622
+                  },
+                  {
+                      "id":  "spell_fire_fireball02",
+                      "local":  "assets/icons/small/spell_fire_fireball02.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_fire_fireball02.jpg",
+                      "status":  "downloaded",
+                      "bytes":  655
+                  },
+                  {
+                      "id":  "spell_fire_flameshock",
+                      "local":  "assets/icons/small/spell_fire_flameshock.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_fire_flameshock.jpg",
+                      "status":  "downloaded",
+                      "bytes":  727
+                  },
+                  {
+                      "id":  "spell_fire_flametongue",
+                      "local":  "",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_fire_flametongue.jpg",
+                      "status":  "failed",
+                      "bytes":  0,
+                      "error":  "Error en el servidor remoto: (404) No se encontró."
+                  },
+                  {
+                      "id":  "spell_fire_immolation",
+                      "local":  "assets/icons/small/spell_fire_immolation.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_fire_immolation.jpg",
+                      "status":  "downloaded",
+                      "bytes":  707
+                  },
+                  {
+                      "id":  "spell_fire_resistfire",
+                      "local":  "",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_fire_resistfire.jpg",
+                      "status":  "failed",
+                      "bytes":  0,
+                      "error":  "Error en el servidor remoto: (404) No se encontró."
+                  },
+                  {
+                      "id":  "spell_fire_searingtotem",
+                      "local":  "assets/icons/small/spell_fire_searingtotem.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_fire_searingtotem.jpg",
+                      "status":  "downloaded",
+                      "bytes":  681
+                  },
+                  {
+                      "id":  "spell_fire_selfdestruct",
+                      "local":  "assets/icons/small/spell_fire_selfdestruct.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_fire_selfdestruct.jpg",
+                      "status":  "downloaded",
+                      "bytes":  697
+                  },
+                  {
+                      "id":  "spell_frost_chainsofice",
+                      "local":  "assets/icons/small/spell_frost_chainsofice.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_frost_chainsofice.jpg",
+                      "status":  "downloaded",
+                      "bytes":  652
+                  },
+                  {
+                      "id":  "spell_frost_freezingbreath",
+                      "local":  "assets/icons/small/spell_frost_freezingbreath.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_frost_freezingbreath.jpg",
+                      "status":  "downloaded",
+                      "bytes":  691
+                  },
+                  {
+                      "id":  "spell_frost_frost",
+                      "local":  "assets/icons/small/spell_frost_frost.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_frost_frost.jpg",
+                      "status":  "downloaded",
+                      "bytes":  569
+                  },
+                  {
+                      "id":  "spell_frost_frostarmor",
+                      "local":  "assets/icons/small/spell_frost_frostarmor.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_frost_frostarmor.jpg",
+                      "status":  "downloaded",
+                      "bytes":  671
+                  },
+                  {
+                      "id":  "spell_frost_frostarmor02",
+                      "local":  "assets/icons/small/spell_frost_frostarmor02.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_frost_frostarmor02.jpg",
+                      "status":  "downloaded",
+                      "bytes":  694
+                  },
+                  {
+                      "id":  "spell_frost_frostbolt02",
+                      "local":  "assets/icons/small/spell_frost_frostbolt02.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_frost_frostbolt02.jpg",
+                      "status":  "downloaded",
+                      "bytes":  558
+                  },
+                  {
+                      "id":  "spell_frost_frostbrand",
+                      "local":  "assets/icons/small/spell_frost_frostbrand.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_frost_frostbrand.jpg",
+                      "status":  "downloaded",
+                      "bytes":  695
+                  },
+                  {
+                      "id":  "spell_frost_frostnova",
+                      "local":  "assets/icons/small/spell_frost_frostnova.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_frost_frostnova.jpg",
+                      "status":  "downloaded",
+                      "bytes":  717
+                  },
+                  {
+                      "id":  "spell_frost_frostshock",
+                      "local":  "assets/icons/small/spell_frost_frostshock.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_frost_frostshock.jpg",
+                      "status":  "downloaded",
+                      "bytes":  680
+                  },
+                  {
+                      "id":  "spell_frost_glacier",
+                      "local":  "assets/icons/small/spell_frost_glacier.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_frost_glacier.jpg",
+                      "status":  "downloaded",
+                      "bytes":  673
+                  },
+                  {
+                      "id":  "spell_frost_iceshock",
+                      "local":  "assets/icons/small/spell_frost_iceshock.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_frost_iceshock.jpg",
+                      "status":  "downloaded",
+                      "bytes":  509
+                  },
+                  {
+                      "id":  "spell_frost_icestorm",
+                      "local":  "assets/icons/small/spell_frost_icestorm.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_frost_icestorm.jpg",
+                      "status":  "downloaded",
+                      "bytes":  610
+                  },
+                  {
+                      "id":  "spell_frost_resistfrost",
+                      "local":  "",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_frost_resistfrost.jpg",
+                      "status":  "failed",
+                      "bytes":  0,
+                      "error":  "Error en el servidor remoto: (404) No se encontró."
+                  },
+                  {
+                      "id":  "spell_frost_summonwaterelemental",
+                      "local":  "assets/icons/small/spell_frost_summonwaterelemental.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_frost_summonwaterelemental.jpg",
+                      "status":  "downloaded",
+                      "bytes":  628
+                  },
+                  {
+                      "id":  "spell_holy_auraoflight",
+                      "local":  "assets/icons/small/spell_holy_auraoflight.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_holy_auraoflight.jpg",
+                      "status":  "downloaded",
+                      "bytes":  696
+                  },
+                  {
+                      "id":  "spell_holy_chastise",
+                      "local":  "assets/icons/small/spell_holy_chastise.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_holy_chastise.jpg",
+                      "status":  "downloaded",
+                      "bytes":  606
+                  },
+                  {
+                      "id":  "spell_holy_crusaderstrike",
+                      "local":  "assets/icons/small/spell_holy_crusaderstrike.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_holy_crusaderstrike.jpg",
+                      "status":  "downloaded",
+                      "bytes":  713
+                  },
+                  {
+                      "id":  "spell_holy_devotionaura",
+                      "local":  "assets/icons/small/spell_holy_devotionaura.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_holy_devotionaura.jpg",
+                      "status":  "downloaded",
+                      "bytes":  707
+                  },
+                  {
+                      "id":  "spell_holy_dispelmagic",
+                      "local":  "assets/icons/small/spell_holy_dispelmagic.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_holy_dispelmagic.jpg",
+                      "status":  "downloaded",
+                      "bytes":  543
+                  },
+                  {
+                      "id":  "spell_holy_divineshield",
+                      "local":  "assets/icons/small/spell_holy_divineshield.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_holy_divineshield.jpg",
+                      "status":  "downloaded",
+                      "bytes":  685
+                  },
+                  {
+                      "id":  "spell_holy_excorcism_02",
+                      "local":  "assets/icons/small/spell_holy_excorcism_02.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_holy_excorcism_02.jpg",
+                      "status":  "downloaded",
+                      "bytes":  686
+                  },
+                  {
+                      "id":  "spell_holy_flashheal",
+                      "local":  "assets/icons/small/spell_holy_flashheal.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_holy_flashheal.jpg",
+                      "status":  "downloaded",
+                      "bytes":  661
+                  },
+                  {
+                      "id":  "spell_holy_greaterblessingofkings",
+                      "local":  "assets/icons/small/spell_holy_greaterblessingofkings.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_holy_greaterblessingofkings.jpg",
+                      "status":  "downloaded",
+                      "bytes":  709
+                  },
+                  {
+                      "id":  "spell_holy_heal",
+                      "local":  "assets/icons/small/spell_holy_heal.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_holy_heal.jpg",
+                      "status":  "downloaded",
+                      "bytes":  616
+                  },
+                  {
+                      "id":  "spell_holy_healingaura",
+                      "local":  "assets/icons/small/spell_holy_healingaura.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_holy_healingaura.jpg",
+                      "status":  "downloaded",
+                      "bytes":  720
+                  },
+                  {
+                      "id":  "spell_holy_holybolt",
+                      "local":  "assets/icons/small/spell_holy_holybolt.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_holy_holybolt.jpg",
+                      "status":  "downloaded",
+                      "bytes":  678
+                  },
+                  {
+                      "id":  "spell_holy_holynova",
+                      "local":  "assets/icons/small/spell_holy_holynova.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_holy_holynova.jpg",
+                      "status":  "downloaded",
+                      "bytes":  637
+                  },
+                  {
+                      "id":  "spell_holy_holyprotection",
+                      "local":  "assets/icons/small/spell_holy_holyprotection.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_holy_holyprotection.jpg",
+                      "status":  "downloaded",
+                      "bytes":  728
+                  },
+                  {
+                      "id":  "spell_holy_holysmite",
+                      "local":  "assets/icons/small/spell_holy_holysmite.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_holy_holysmite.jpg",
+                      "status":  "downloaded",
+                      "bytes":  618
+                  },
+                  {
+                      "id":  "spell_holy_innerfire",
+                      "local":  "assets/icons/small/spell_holy_innerfire.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_holy_innerfire.jpg",
+                      "status":  "downloaded",
+                      "bytes":  606
+                  },
+                  {
+                      "id":  "spell_holy_judgement",
+                      "local":  "",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_holy_judgement.jpg",
+                      "status":  "failed",
+                      "bytes":  0,
+                      "error":  "Error en el servidor remoto: (404) No se encontró."
+                  },
+                  {
+                      "id":  "spell_holy_layonhands",
+                      "local":  "assets/icons/small/spell_holy_layonhands.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_holy_layonhands.jpg",
+                      "status":  "downloaded",
+                      "bytes":  598
+                  },
+                  {
+                      "id":  "spell_holy_lesserheal",
+                      "local":  "assets/icons/small/spell_holy_lesserheal.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_holy_lesserheal.jpg",
+                      "status":  "downloaded",
+                      "bytes":  583
+                  },
+                  {
+                      "id":  "spell_holy_magicalsentry",
+                      "local":  "assets/icons/small/spell_holy_magicalsentry.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_holy_magicalsentry.jpg",
+                      "status":  "downloaded",
+                      "bytes":  692
+                  },
+                  {
+                      "id":  "spell_holy_moonfire",
+                      "local":  "",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_holy_moonfire.jpg",
+                      "status":  "failed",
+                      "bytes":  0,
+                      "error":  "Error en el servidor remoto: (404) No se encontró."
+                  },
+                  {
+                      "id":  "spell_holy_powerwordshield",
+                      "local":  "assets/icons/small/spell_holy_powerwordshield.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_holy_powerwordshield.jpg",
+                      "status":  "downloaded",
+                      "bytes":  707
+                  },
+                  {
+                      "id":  "spell_holy_prayerofhealing",
+                      "local":  "assets/icons/small/spell_holy_prayerofhealing.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_holy_prayerofhealing.jpg",
+                      "status":  "downloaded",
+                      "bytes":  656
+                  },
+                  {
+                      "id":  "spell_holy_prayerofhealing02",
+                      "local":  "assets/icons/small/spell_holy_prayerofhealing02.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_holy_prayerofhealing02.jpg",
+                      "status":  "downloaded",
+                      "bytes":  670
+                  },
+                  {
+                      "id":  "spell_holy_purify",
+                      "local":  "assets/icons/small/spell_holy_purify.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_holy_purify.jpg",
+                      "status":  "downloaded",
+                      "bytes":  617
+                  },
+                  {
+                      "id":  "spell_holy_removecurse",
+                      "local":  "assets/icons/small/spell_holy_removecurse.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_holy_removecurse.jpg",
+                      "status":  "downloaded",
+                      "bytes":  681
+                  },
+                  {
+                      "id":  "spell_holy_renew",
+                      "local":  "assets/icons/small/spell_holy_renew.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_holy_renew.jpg",
+                      "status":  "downloaded",
+                      "bytes":  675
+                  },
+                  {
+                      "id":  "spell_holy_restoration",
+                      "local":  "assets/icons/small/spell_holy_restoration.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_holy_restoration.jpg",
+                      "status":  "downloaded",
+                      "bytes":  627
+                  },
+                  {
+                      "id":  "spell_holy_sealofmight",
+                      "local":  "assets/icons/small/spell_holy_sealofmight.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_holy_sealofmight.jpg",
+                      "status":  "downloaded",
+                      "bytes":  710
+                  },
+                  {
+                      "id":  "spell_holy_sealofprotection",
+                      "local":  "assets/icons/small/spell_holy_sealofprotection.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_holy_sealofprotection.jpg",
+                      "status":  "downloaded",
+                      "bytes":  659
+                  },
+                  {
+                      "id":  "spell_holy_sealofvalor",
+                      "local":  "assets/icons/small/spell_holy_sealofvalor.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_holy_sealofvalor.jpg",
+                      "status":  "downloaded",
+                      "bytes":  642
+                  },
+                  {
+                      "id":  "spell_holy_sealofwisdom",
+                      "local":  "assets/icons/small/spell_holy_sealofwisdom.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_holy_sealofwisdom.jpg",
+                      "status":  "downloaded",
+                      "bytes":  717
+                  },
+                  {
+                      "id":  "spell_holy_searinglight",
+                      "local":  "assets/icons/small/spell_holy_searinglight.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_holy_searinglight.jpg",
+                      "status":  "downloaded",
+                      "bytes":  656
+                  },
+                  {
+                      "id":  "spell_holy_wordfortitude",
+                      "local":  "assets/icons/small/spell_holy_wordfortitude.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_holy_wordfortitude.jpg",
+                      "status":  "downloaded",
+                      "bytes":  626
+                  },
+                  {
+                      "id":  "spell_ice_lament",
+                      "local":  "assets/icons/small/spell_ice_lament.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_ice_lament.jpg",
+                      "status":  "downloaded",
+                      "bytes":  656
+                  },
+                  {
+                      "id":  "spell_nature_abolishmagic",
+                      "local":  "assets/icons/small/spell_nature_abolishmagic.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_abolishmagic.jpg",
+                      "status":  "downloaded",
+                      "bytes":  615
+                  },
+                  {
+                      "id":  "spell_nature_ancestralguardian",
+                      "local":  "assets/icons/small/spell_nature_ancestralguardian.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_ancestralguardian.jpg",
+                      "status":  "downloaded",
+                      "bytes":  648
+                  },
+                  {
+                      "id":  "spell_nature_bloodlust",
+                      "local":  "assets/icons/small/spell_nature_bloodlust.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_bloodlust.jpg",
+                      "status":  "downloaded",
+                      "bytes":  622
+                  },
+                  {
+                      "id":  "spell_nature_chainlightning",
+                      "local":  "assets/icons/small/spell_nature_chainlightning.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_chainlightning.jpg",
+                      "status":  "downloaded",
+                      "bytes":  630
+                  },
+                  {
+                      "id":  "spell_nature_cyclone",
+                      "local":  "assets/icons/small/spell_nature_cyclone.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_cyclone.jpg",
+                      "status":  "downloaded",
+                      "bytes":  566
+                  },
+                  {
+                      "id":  "spell_nature_diseasecleansingtotem",
+                      "local":  "assets/icons/small/spell_nature_diseasecleansingtotem.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_diseasecleansingtotem.jpg",
+                      "status":  "downloaded",
+                      "bytes":  687
+                  },
+                  {
+                      "id":  "spell_nature_earthbindtotem",
+                      "local":  "assets/icons/small/spell_nature_earthbindtotem.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_earthbindtotem.jpg",
+                      "status":  "downloaded",
+                      "bytes":  659
+                  },
+                  {
+                      "id":  "spell_nature_earthshock",
+                      "local":  "assets/icons/small/spell_nature_earthshock.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_earthshock.jpg",
+                      "status":  "downloaded",
+                      "bytes":  698
+                  },
+                  {
+                      "id":  "spell_nature_forceofnature",
+                      "local":  "assets/icons/small/spell_nature_forceofnature.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_forceofnature.jpg",
+                      "status":  "downloaded",
+                      "bytes":  650
+                  },
+                  {
+                      "id":  "spell_nature_groundingtotem",
+                      "local":  "assets/icons/small/spell_nature_groundingtotem.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_groundingtotem.jpg",
+                      "status":  "downloaded",
+                      "bytes":  704
+                  },
+                  {
+                      "id":  "spell_nature_healingtouch",
+                      "local":  "assets/icons/small/spell_nature_healingtouch.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_healingtouch.jpg",
+                      "status":  "downloaded",
+                      "bytes":  633
+                  },
+                  {
+                      "id":  "spell_nature_healingwavegreater",
+                      "local":  "assets/icons/small/spell_nature_healingwavegreater.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_healingwavegreater.jpg",
+                      "status":  "downloaded",
+                      "bytes":  716
+                  },
+                  {
+                      "id":  "spell_nature_healingwavelesser",
+                      "local":  "assets/icons/small/spell_nature_healingwavelesser.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_healingwavelesser.jpg",
+                      "status":  "downloaded",
+                      "bytes":  732
+                  },
+                  {
+                      "id":  "spell_nature_invisibilitytotem",
+                      "local":  "assets/icons/small/spell_nature_invisibilitytotem.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_invisibilitytotem.jpg",
+                      "status":  "downloaded",
+                      "bytes":  626
+                  },
+                  {
+                      "id":  "spell_nature_lightning",
+                      "local":  "assets/icons/small/spell_nature_lightning.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_lightning.jpg",
+                      "status":  "downloaded",
+                      "bytes":  583
+                  },
+                  {
+                      "id":  "spell_nature_lightningbolt",
+                      "local":  "assets/icons/small/spell_nature_lightningbolt.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_lightningbolt.jpg",
+                      "status":  "downloaded",
+                      "bytes":  606
+                  },
+                  {
+                      "id":  "spell_nature_lightningshield",
+                      "local":  "assets/icons/small/spell_nature_lightningshield.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_lightningshield.jpg",
+                      "status":  "downloaded",
+                      "bytes":  645
+                  },
+                  {
+                      "id":  "spell_nature_magicimmunity",
+                      "local":  "assets/icons/small/spell_nature_magicimmunity.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_magicimmunity.jpg",
+                      "status":  "downloaded",
+                      "bytes":  714
+                  },
+                  {
+                      "id":  "spell_nature_manaregentotem",
+                      "local":  "assets/icons/small/spell_nature_manaregentotem.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_manaregentotem.jpg",
+                      "status":  "downloaded",
+                      "bytes":  665
+                  },
+                  {
+                      "id":  "spell_nature_naturetouchgrow",
+                      "local":  "assets/icons/small/spell_nature_naturetouchgrow.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_naturetouchgrow.jpg",
+                      "status":  "downloaded",
+                      "bytes":  570
+                  },
+                  {
+                      "id":  "spell_nature_nullifydisease",
+                      "local":  "assets/icons/small/spell_nature_nullifydisease.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_nullifydisease.jpg",
+                      "status":  "downloaded",
+                      "bytes":  687
+                  },
+                  {
+                      "id":  "spell_nature_nullifypoison_02",
+                      "local":  "assets/icons/small/spell_nature_nullifypoison_02.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_nullifypoison_02.jpg",
+                      "status":  "downloaded",
+                      "bytes":  673
+                  },
+                  {
+                      "id":  "spell_nature_polymorph",
+                      "local":  "assets/icons/small/spell_nature_polymorph.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_polymorph.jpg",
+                      "status":  "downloaded",
+                      "bytes":  590
+                  },
+                  {
+                      "id":  "spell_nature_ravenform",
+                      "local":  "assets/icons/small/spell_nature_ravenform.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_ravenform.jpg",
+                      "status":  "downloaded",
+                      "bytes":  564
+                  },
+                  {
+                      "id":  "spell_nature_regenerate",
+                      "local":  "assets/icons/small/spell_nature_regenerate.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_regenerate.jpg",
+                      "status":  "downloaded",
+                      "bytes":  690
+                  },
+                  {
+                      "id":  "spell_nature_regeneration",
+                      "local":  "assets/icons/small/spell_nature_regeneration.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_regeneration.jpg",
+                      "status":  "downloaded",
+                      "bytes":  615
+                  },
+                  {
+                      "id":  "spell_nature_reincarnation",
+                      "local":  "assets/icons/small/spell_nature_reincarnation.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_reincarnation.jpg",
+                      "status":  "downloaded",
+                      "bytes":  676
+                  },
+                  {
+                      "id":  "spell_nature_rejuvenation",
+                      "local":  "assets/icons/small/spell_nature_rejuvenation.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_rejuvenation.jpg",
+                      "status":  "downloaded",
+                      "bytes":  674
+                  },
+                  {
+                      "id":  "spell_nature_slowingtotem",
+                      "local":  "assets/icons/small/spell_nature_slowingtotem.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_slowingtotem.jpg",
+                      "status":  "downloaded",
+                      "bytes":  668
+                  },
+                  {
+                      "id":  "spell_nature_spiritwolf",
+                      "local":  "assets/icons/small/spell_nature_spiritwolf.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_spiritwolf.jpg",
+                      "status":  "downloaded",
+                      "bytes":  627
+                  },
+                  {
+                      "id":  "spell_nature_starfall",
+                      "local":  "assets/icons/small/spell_nature_starfall.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_starfall.jpg",
+                      "status":  "downloaded",
+                      "bytes":  600
+                  },
+                  {
+                      "id":  "spell_nature_stoneclawtotem",
+                      "local":  "assets/icons/small/spell_nature_stoneclawtotem.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_stoneclawtotem.jpg",
+                      "status":  "downloaded",
+                      "bytes":  710
+                  },
+                  {
+                      "id":  "spell_nature_stoneskintotem",
+                      "local":  "assets/icons/small/spell_nature_stoneskintotem.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_stoneskintotem.jpg",
+                      "status":  "downloaded",
+                      "bytes":  679
+                  },
+                  {
+                      "id":  "spell_nature_stranglevines",
+                      "local":  "assets/icons/small/spell_nature_stranglevines.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_stranglevines.jpg",
+                      "status":  "downloaded",
+                      "bytes":  578
+                  },
+                  {
+                      "id":  "spell_nature_swiftness",
+                      "local":  "assets/icons/small/spell_nature_swiftness.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_swiftness.jpg",
+                      "status":  "downloaded",
+                      "bytes":  668
+                  },
+                  {
+                      "id":  "spell_nature_tranquility",
+                      "local":  "assets/icons/small/spell_nature_tranquility.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_tranquility.jpg",
+                      "status":  "downloaded",
+                      "bytes":  564
+                  },
+                  {
+                      "id":  "spell_nature_tremortotem",
+                      "local":  "assets/icons/small/spell_nature_tremortotem.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_tremortotem.jpg",
+                      "status":  "downloaded",
+                      "bytes":  703
+                  },
+                  {
+                      "id":  "spell_nature_windfury",
+                      "local":  "assets/icons/small/spell_nature_windfury.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_windfury.jpg",
+                      "status":  "downloaded",
+                      "bytes":  649
+                  },
+                  {
+                      "id":  "spell_nature_wispsplode",
+                      "local":  "assets/icons/small/spell_nature_wispsplode.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_wispsplode.jpg",
+                      "status":  "downloaded",
+                      "bytes":  595
+                  },
+                  {
+                      "id":  "spell_nature_wrathv2",
+                      "local":  "assets/icons/small/spell_nature_wrathv2.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_nature_wrathv2.jpg",
+                      "status":  "downloaded",
+                      "bytes":  669
+                  },
+                  {
+                      "id":  "spell_shadow_abominationexplosion",
+                      "local":  "assets/icons/small/spell_shadow_abominationexplosion.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_abominationexplosion.jpg",
+                      "status":  "downloaded",
+                      "bytes":  646
+                  },
+                  {
+                      "id":  "spell_shadow_antimagicshell",
+                      "local":  "assets/icons/small/spell_shadow_antimagicshell.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_antimagicshell.jpg",
+                      "status":  "downloaded",
+                      "bytes":  676
+                  },
+                  {
+                      "id":  "spell_shadow_antishadow",
+                      "local":  "assets/icons/small/spell_shadow_antishadow.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_antishadow.jpg",
+                      "status":  "downloaded",
+                      "bytes":  631
+                  },
+                  {
+                      "id":  "spell_shadow_bloodboil",
+                      "local":  "assets/icons/small/spell_shadow_bloodboil.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_bloodboil.jpg",
+                      "status":  "downloaded",
+                      "bytes":  653
+                  },
+                  {
+                      "id":  "spell_shadow_chilltouch",
+                      "local":  "assets/icons/small/spell_shadow_chilltouch.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_chilltouch.jpg",
+                      "status":  "downloaded",
+                      "bytes":  604
+                  },
+                  {
+                      "id":  "spell_shadow_cripple",
+                      "local":  "assets/icons/small/spell_shadow_cripple.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_cripple.jpg",
+                      "status":  "downloaded",
+                      "bytes":  652
+                  },
+                  {
+                      "id":  "spell_shadow_curseofmannoroth",
+                      "local":  "assets/icons/small/spell_shadow_curseofmannoroth.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_curseofmannoroth.jpg",
+                      "status":  "downloaded",
+                      "bytes":  698
+                  },
+                  {
+                      "id":  "spell_shadow_curseofsargeras",
+                      "local":  "assets/icons/small/spell_shadow_curseofsargeras.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_curseofsargeras.jpg",
+                      "status":  "downloaded",
+                      "bytes":  705
+                  },
+                  {
+                      "id":  "spell_shadow_curseoftounges",
+                      "local":  "assets/icons/small/spell_shadow_curseoftounges.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_curseoftounges.jpg",
+                      "status":  "downloaded",
+                      "bytes":  650
+                  },
+                  {
+                      "id":  "spell_shadow_darkritual",
+                      "local":  "assets/icons/small/spell_shadow_darkritual.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_darkritual.jpg",
+                      "status":  "downloaded",
+                      "bytes":  734
+                  },
+                  {
+                      "id":  "spell_shadow_deathcoil",
+                      "local":  "assets/icons/small/spell_shadow_deathcoil.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_deathcoil.jpg",
+                      "status":  "downloaded",
+                      "bytes":  697
+                  },
+                  {
+                      "id":  "spell_shadow_deathscream",
+                      "local":  "assets/icons/small/spell_shadow_deathscream.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_deathscream.jpg",
+                      "status":  "downloaded",
+                      "bytes":  595
+                  },
+                  {
+                      "id":  "spell_shadow_demonbreath",
+                      "local":  "assets/icons/small/spell_shadow_demonbreath.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_demonbreath.jpg",
+                      "status":  "downloaded",
+                      "bytes":  589
+                  },
+                  {
+                      "id":  "spell_shadow_enslavedemon",
+                      "local":  "assets/icons/small/spell_shadow_enslavedemon.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_enslavedemon.jpg",
+                      "status":  "downloaded",
+                      "bytes":  696
+                  },
+                  {
+                      "id":  "spell_shadow_evileye",
+                      "local":  "assets/icons/small/spell_shadow_evileye.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_evileye.jpg",
+                      "status":  "downloaded",
+                      "bytes":  590
+                  },
+                  {
+                      "id":  "spell_shadow_haunting",
+                      "local":  "assets/icons/small/spell_shadow_haunting.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_haunting.jpg",
+                      "status":  "downloaded",
+                      "bytes":  570
+                  },
+                  {
+                      "id":  "spell_shadow_lifedrain",
+                      "local":  "assets/icons/small/spell_shadow_lifedrain.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_lifedrain.jpg",
+                      "status":  "downloaded",
+                      "bytes":  511
+                  },
+                  {
+                      "id":  "spell_shadow_lifedrain02",
+                      "local":  "assets/icons/small/spell_shadow_lifedrain02.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_lifedrain02.jpg",
+                      "status":  "downloaded",
+                      "bytes":  660
+                  },
+                  {
+                      "id":  "spell_shadow_metamorphosis",
+                      "local":  "assets/icons/small/spell_shadow_metamorphosis.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_metamorphosis.jpg",
+                      "status":  "downloaded",
+                      "bytes":  641
+                  },
+                  {
+                      "id":  "spell_shadow_mindsteal",
+                      "local":  "assets/icons/small/spell_shadow_mindsteal.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_mindsteal.jpg",
+                      "status":  "downloaded",
+                      "bytes":  585
+                  },
+                  {
+                      "id":  "spell_shadow_possession",
+                      "local":  "assets/icons/small/spell_shadow_possession.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_possession.jpg",
+                      "status":  "downloaded",
+                      "bytes":  560
+                  },
+                  {
+                      "id":  "spell_shadow_psychicscream",
+                      "local":  "assets/icons/small/spell_shadow_psychicscream.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_psychicscream.jpg",
+                      "status":  "downloaded",
+                      "bytes":  685
+                  },
+                  {
+                      "id":  "spell_shadow_ragingscream",
+                      "local":  "assets/icons/small/spell_shadow_ragingscream.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_ragingscream.jpg",
+                      "status":  "downloaded",
+                      "bytes":  571
+                  },
+                  {
+                      "id":  "spell_shadow_rainoffire",
+                      "local":  "assets/icons/small/spell_shadow_rainoffire.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_rainoffire.jpg",
+                      "status":  "downloaded",
+                      "bytes":  713
+                  },
+                  {
+                      "id":  "spell_shadow_raiseundead",
+                      "local":  "",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_raiseundead.jpg",
+                      "status":  "failed",
+                      "bytes":  0,
+                      "error":  "Error en el servidor remoto: (404) No se encontró."
+                  },
+                  {
+                      "id":  "spell_shadow_requiem",
+                      "local":  "assets/icons/small/spell_shadow_requiem.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_requiem.jpg",
+                      "status":  "downloaded",
+                      "bytes":  618
+                  },
+                  {
+                      "id":  "spell_shadow_ritualofsacrifice",
+                      "local":  "assets/icons/small/spell_shadow_ritualofsacrifice.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_ritualofsacrifice.jpg",
+                      "status":  "downloaded",
+                      "bytes":  637
+                  },
+                  {
+                      "id":  "spell_shadow_shadowbolt",
+                      "local":  "assets/icons/small/spell_shadow_shadowbolt.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_shadowbolt.jpg",
+                      "status":  "downloaded",
+                      "bytes":  608
+                  },
+                  {
+                      "id":  "spell_shadow_shadowform",
+                      "local":  "assets/icons/small/spell_shadow_shadowform.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_shadowform.jpg",
+                      "status":  "downloaded",
+                      "bytes":  617
+                  },
+                  {
+                      "id":  "spell_shadow_shadowward",
+                      "local":  "assets/icons/small/spell_shadow_shadowward.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_shadowward.jpg",
+                      "status":  "downloaded",
+                      "bytes":  665
+                  },
+                  {
+                      "id":  "spell_shadow_shadowworddominate",
+                      "local":  "assets/icons/small/spell_shadow_shadowworddominate.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_shadowworddominate.jpg",
+                      "status":  "downloaded",
+                      "bytes":  668
+                  },
+                  {
+                      "id":  "spell_shadow_shadowwordpain",
+                      "local":  "assets/icons/small/spell_shadow_shadowwordpain.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_shadowwordpain.jpg",
+                      "status":  "downloaded",
+                      "bytes":  700
+                  },
+                  {
+                      "id":  "spell_shadow_siphonmana",
+                      "local":  "assets/icons/small/spell_shadow_siphonmana.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_siphonmana.jpg",
+                      "status":  "downloaded",
+                      "bytes":  656
+                  },
+                  {
+                      "id":  "spell_shadow_summonfelhunter",
+                      "local":  "assets/icons/small/spell_shadow_summonfelhunter.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_summonfelhunter.jpg",
+                      "status":  "downloaded",
+                      "bytes":  638
+                  },
+                  {
+                      "id":  "spell_shadow_summonimp",
+                      "local":  "assets/icons/small/spell_shadow_summonimp.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_summonimp.jpg",
+                      "status":  "downloaded",
+                      "bytes":  680
+                  },
+                  {
+                      "id":  "spell_shadow_summonsuccubus",
+                      "local":  "assets/icons/small/spell_shadow_summonsuccubus.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_summonsuccubus.jpg",
+                      "status":  "downloaded",
+                      "bytes":  603
+                  },
+                  {
+                      "id":  "spell_shadow_summonvoidwalker",
+                      "local":  "assets/icons/small/spell_shadow_summonvoidwalker.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_summonvoidwalker.jpg",
+                      "status":  "downloaded",
+                      "bytes":  608
+                  },
+                  {
+                      "id":  "spell_shadow_teleport",
+                      "local":  "assets/icons/small/spell_shadow_teleport.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_teleport.jpg",
+                      "status":  "downloaded",
+                      "bytes":  569
+                  },
+                  {
+                      "id":  "spell_shadow_twilight",
+                      "local":  "assets/icons/small/spell_shadow_twilight.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_twilight.jpg",
+                      "status":  "downloaded",
+                      "bytes":  517
+                  },
+                  {
+                      "id":  "spell_shadow_unholyfrenzy",
+                      "local":  "assets/icons/small/spell_shadow_unholyfrenzy.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_unholyfrenzy.jpg",
+                      "status":  "downloaded",
+                      "bytes":  676
+                  },
+                  {
+                      "id":  "spell_shadow_unholystrength",
+                      "local":  "assets/icons/small/spell_shadow_unholystrength.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/spell_shadow_unholystrength.jpg",
+                      "status":  "downloaded",
+                      "bytes":  690
+                  },
+                  {
+                      "id":  "trade_engineering",
+                      "local":  "assets/icons/small/trade_engineering.jpg",
+                      "source":  "https://wow.zamimg.com/images/wow/icons/small/trade_engineering.jpg",
+                      "status":  "downloaded",
+                      "bytes":  653
+                  }
+              ],
+    "Count":  229
+}
